@@ -6,16 +6,21 @@
 //  Copyright (c) 2014 Ryan Burr. All rights reserved.
 //
 
-#import "AppDelegate.h"
+#import "ITAppDelegate.h"
+#import "ITViewController.h"
 
-@interface AppDelegate ()
+@interface ITAppDelegate ()
 
 @end
 
-@implementation AppDelegate
+@implementation ITAppDelegate
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    ITViewController *vc = [ITViewController new];
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:vc];
+    self.window.rootViewController = navController;
+    [self.window makeKeyAndVisible];
     // Override point for customization after application launch.
     return YES;
 }
