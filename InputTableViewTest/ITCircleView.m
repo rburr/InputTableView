@@ -34,4 +34,16 @@
     self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, radius, radius);
 }
 
+- (UIImage *)imageValue {
+    BOOL opaque = self.opaque;
+    self.opaque = NO;
+    UIGraphicsBeginImageContextWithOptions(self.bounds.size, self.opaque, 0.0);
+    [self.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage * img = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    self.opaque = opaque;
+    
+    return img;
+}
+
 @end

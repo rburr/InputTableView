@@ -13,5 +13,6 @@
 
 - (id)initWithColor:(UIColor *)color;
 - (void)setRadius:(CGFloat)radius;
+- (UIImage *)imageValue;
 
 @end

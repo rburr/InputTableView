@@ -24,6 +24,7 @@
 @property (nonatomic, strong) NSString *licenseId;
 @property (nonatomic, strong) NSString *licenseState;
 @property (nonatomic, strong) NSString *licenseCountry;
+@property (nonatomic) NSInteger powerLevel;
 
 + (instancetype)testObject;
 

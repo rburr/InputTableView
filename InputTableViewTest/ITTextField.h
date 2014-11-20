@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ITTextObject.h"
+#import "ITProperty.h"
+
+typedef id (^ActivateBlock)();
 
 @protocol ITDisplayErrorMessageDelegate <NSObject>
 - (void)displayErroMessageAtIndexPath:(NSIndexPath *)indexPath;
@@ -18,11 +20,12 @@
 @interface ITTextField : UITextField <UITextFieldDelegate>
 @property (nonatomic, weak) id <ITDisplayErrorMessageDelegate> displayMessageDelete;
 @property (nonatomic, strong) NSIndexPath *indexPath;
-@property (nonatomic, strong) ITTextObject *respresentedObject;
-@property (nonatomic, copy) id (^TextFieldActivated)();
+@property (nonatomic, strong) ITProperty *respresentedObject;
+@property (nonatomic, copy) ActivateBlock textFieldActivated;
 @property (nonatomic) NSNumberFormatterStyle numberFormatStyle;
 @property (nonatomic, strong) UIColor *errorTextColor;
 @property (nonatomic, strong) UIButton *errorButton;
+@property (nonatomic, strong) UILabel *floatingPlaceHolderLabel;
 
 - (void)displayErrorButton;
 

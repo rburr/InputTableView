@@ -10,7 +10,7 @@
 
 @interface ITErrorMessageView : UIView
 @property (nonatomic, strong) UIButton *presentingButton;
-@property (nonatomic, strong) NSString *messageText;
+@property (nonatomic, strong) UILabel *messageLabel;
 @property (nonatomic, strong) NSIndexPath *indexPath;
 
 @end

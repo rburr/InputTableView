@@ -7,16 +7,20 @@
 //  Copyright (c) 2014 Ryan Burr. All rights reserved.
 //
 
-#import "ITTextObject.h"
+#import "ITProperty.h"
 #import <objc/runtime.h>
 #import "ITConstants.h"
 
-@implementation ITTextObject
+@implementation ITProperty
 
-+ (instancetype)createObjectForProperty:(NSString *)propertyName fromObject:(id)object {
-    ITTextObject *textObject = [ITTextObject new];
-    textObject.originalValue = [object valueForKey:propertyName];
++ (instancetype)createFromProperty:(NSString *)propertyName ofObject:(id)object {
+    ITProperty *textObject = [ITProperty new];
+    id value = [object valueForKey:propertyName];
+    textObject.representedProperty = propertyName;
+    textObject.originalValue = value;
+    textObject.currentValue = value;
     textObject.propertyName = [self formatPropertyName:propertyName];
+    textObject.representedPropertyClass = [ITProperty classForProperty:propertyName fromObject:object];
 
     return textObject;
 }
@@ -50,6 +54,21 @@
         }
     }
     return hasError;
+}
+
++ (Class)classForProperty:(NSString *)property fromObject:(id)object {
+    objc_property_t classProperty = class_getProperty([object class], [property UTF8String]);
+    const char *propertyAttrs = property_getAttributes(classProperty);
+    NSString *propertyString = [NSString stringWithUTF8String:propertyAttrs];
+    if ([propertyString rangeOfString:@"@"].location != NSNotFound) {
+        // '\' is an escape character, looking for ' " '
+        NSArray *components = [propertyString componentsSeparatedByString:@"\""];
+        // '\' is an escape character, looking for ' \ '
+        NSString *propertyClass = [components[1] stringByReplacingOccurrencesOfString:@"\\" withString:@""];
+        return NSClassFromString(propertyClass);
+    }
+    
+    return nil;
 }
 
 @end

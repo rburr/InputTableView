@@ -11,7 +11,6 @@
 
 @interface ITErrorMessageView ()
 @property (nonatomic, strong) ITTriangleView *triangleView;
-@property (nonatomic, strong) UILabel *messageLabel;
 
 @end
 
@@ -40,13 +39,14 @@
 - (void)addMessageLabel {
     self.messageLabel = [UILabel new];
     self.messageLabel.textColor = [UIColor whiteColor];
-    self.messageLabel.text = self.messageText;
+    self.messageLabel.font = [UIFont systemFontOfSize:14];
+    self.messageLabel.numberOfLines = 0;
     [self addSubview:self.messageLabel];
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    self.messageLabel.frame = CGRectMake(-5, 2, self.frame.size.width -10, self.frame.size.height -4);
+    self.messageLabel.frame = CGRectMake(5, 2, self.frame.size.width - 10, self.frame.size.height -4);
     self.triangleView.frame = CGRectMake([self triangleAnchorPoint], self.frame.size.height, 20, 10);
 }
 

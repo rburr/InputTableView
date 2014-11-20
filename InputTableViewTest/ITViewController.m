@@ -9,12 +9,12 @@
 #import "ITViewController.h"
 #import "ITTableViewCell.h"
 #import "ITTestObject.h"
-#import "ITTextFieldTableView.h"
+#import "ITTableView.h"
 #import "ITValidationRule.h"
 #import "ITConstants.h"
 
 @interface ITViewController () <UITableViewDataSource, UITableViewDelegate>
-@property (nonatomic, strong) ITTextFieldTableView *tableView;
+@property (nonatomic, strong) ITTableView *tableView;
 @end
 
 @implementation ITViewController
@@ -23,7 +23,7 @@
     [super viewDidLoad];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStylePlain target:self action:@selector(saveAction)];
     self.view.backgroundColor = [UIColor whiteColor];
-    self.tableView = [ITTextFieldTableView new];
+    self.tableView = [ITTableView new];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.frame = self.view.frame;
@@ -31,7 +31,7 @@
 }
 
 - (NSArray *)properties {
-    return @[@"firstName", @"lastName", @"age", @"homeOrMobilePhone", @"streetOne", @"streetTwo", @"streetThree", @"zip", @"city", @"state", @"country", @"dateOfBirth", @"licenseId", @"licenseState", @"licenseCountry"];
+    return @[@"firstName", @"lastName", @"age", @"homeOrMobilePhone", @"streetOne", @"streetTwo", @"streetThree", @"zip", @"city", @"state", @"country", @"dateOfBirth", @"licenseId", @"licenseState", @"licenseCountry", @"powerLevel"];
 }
 
 - (NSArray *)textObjects:(NSInteger)count {
@@ -39,21 +39,21 @@
     for (int i = 0; i < count; i++) {
         NSString *property = [[self properties] objectAtIndex:i];
         ITTestObject *object = [ITTestObject testObject];
-        ITTextObject *textObject = [ITTextObject createObjectForProperty:property fromObject:object];
+        ITProperty *textObject = [ITProperty createFromProperty:property ofObject:object];
         ITValidationRule *rule = [ITValidationRule minimumLengthRule];
-        rule.minimumLength = 2;
+        rule.minimumLength = 1;
         textObject.validationRules = @[rule];
         [objects addObject:textObject];
     }
     return [NSArray arrayWithArray:objects];
 }
 
-- (NSInteger)tableView:(ITTextFieldTableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(ITTableView *)tableView numberOfRowsInSection:(NSInteger)section {
     tableView.textObjects = [self textObjects:[self properties].count];
     return [self properties].count;
 }
 
-- (UITableViewCell *)tableView:(ITTextFieldTableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(ITTableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *cellIdentifer = @"ITTableViewCellIdentifer";
     ITTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifer];
     if (cell == nil) {
@@ -68,6 +68,13 @@
 - (void)saveAction {
     [self.tableView checkAndDisplayValidationErrors];
     
+    if ([self.tableView shouldUpdate]) {
+        [self.tableView updateObject];
+//        [self.tableView reloadData];
+    } else {
+        [self.tableView updateObject];
+        
+    }
 }
 
 @end

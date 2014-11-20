@@ -9,15 +9,17 @@
 #import <Foundation/Foundation.h>
 #import "ITValidationRule.h"
 
-@interface ITTextObject : NSObject
+@interface ITProperty : NSObject
 @property (nonatomic, strong) NSArray *validationRules;
 @property (nonatomic, strong) NSString *propertyName;
+@property (nonatomic, strong) NSString *representedProperty;
 @property (nonatomic, strong) id originalValue;
 @property (nonatomic, strong) id currentValue;
+@property (nonatomic) Class representedPropertyClass;
 @property (nonatomic) BOOL isFieldClear;
 @property (nonatomic) BOOL displayError;
 
-+ (instancetype)createObjectForProperty:(NSString *)propertyName fromObject:(id)object;
++ (instancetype)createFromProperty:(NSString *)propertyName ofObject:(id)object;
 - (BOOL)hasErrorMessage;
 
 @end

@@ -9,10 +9,13 @@
 #import "ITValidationRule.h"
 #import <UIKit/UIKit.h>
 #import "ITConstants.h"
+#import <objc/runtime.h>
 
 @interface ITValidationRule ()
 
 @end
+
+static NSString *const kWildcard = @"%@";
 
 @implementation ITValidationRule
 
@@ -48,6 +51,8 @@
 
 + (ITValidationRule *)minimumLengthRule {
     ITValidationRule *minimumLengthRule = [ITValidationRule new];
+    minimumLengthRule.errorMessageTemplate = @"Text must be at least %@ characters";
+    minimumLengthRule.errorMessageParameters = @[@"minimumLength"];
     blockVar(minimumLengthRule, weakMinimunRule)
     minimumLengthRule.validationError = ^BOOL(id value) {
         if ([value isKindOfClass:[NSString class]]) {
@@ -68,5 +73,125 @@
     };
     return maximumLengthRule;
 }
+
+/**
+ *  Creates a string from the template inserting wildcards at the specifier. The reason for this method is to create the string at runtime with the specified properties.
+ */
+- (NSString *)errorMessage {
+    NSArray *stringArray = [self.errorMessageTemplate componentsSeparatedByString:kWildcard];
+    if (stringArray.count != self.errorMessageParameters.count + 1) {
+        return nil;
+    }
+    
+    __block NSString *completedString = stringArray.firstObject;
+    blockVar(self, weakSelf);
+    [self.errorMessageParameters enumerateObjectsUsingBlock:^(NSString *wildcard, NSUInteger index, BOOL *stop) {
+        
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+#pragma clang diagnostic pop
+    
+        
+        SEL selector = NSSelectorFromString(wildcard);
+        IMP imp = [weakSelf methodForSelector:selector];
+        
+        NSString *insertValue = @"";
+        id value;
+        
+        if ([weakSelf respondsToSelector:selector]) {
+            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
+                                        [[weakSelf class] instanceMethodSignatureForSelector:selector]];
+            [invocation setSelector:selector];
+            [invocation setTarget:weakSelf];
+            [invocation invoke];
+            void *returnValue;
+            [invocation getReturnValue:&returnValue];
+        }
+        
+        if ([weakSelf respondsToSelector:selector]) {
+            Method method = class_getInstanceMethod([weakSelf class], selector);
+            char *returnType = method_copyReturnType(method);
+//            NSString* propertyType = [NSString stringWithFormat:@"%s", returnType];
+            char character = returnType[0];
+            NSString *type;
+            NSNumber *number;
+            switch (character){
+                    
+                case 'd': {
+                    //type = @"double";
+                    double (*func)(id, SEL) = (void *)imp;
+                    func(weakSelf, selector);
+                    number = [NSNumber numberWithDouble:func(weakSelf, selector)];
+                    break;
+                }
+                case 'i': {
+                    //type = @"int";
+                    int (*func)(id, SEL) = (void *)imp;
+                    func(weakSelf, selector);
+                    number = [NSNumber numberWithDouble:func(weakSelf, selector)];
+                    break;
+                }
+                    break;
+                case 'f': {
+                    type = @"float";
+                    int (*func)(id, SEL) = (void *)imp;
+                    func(weakSelf, selector);
+                    number = [NSNumber numberWithDouble:func(weakSelf, selector)];
+                    
+                    break;
+                }
+//                case 'c': type = @"BOOL"; break;
+//                case 's': type = @"short"; break;
+                case 'l': {
+                    long (*func)(id, SEL) = (void *)imp;
+                    func(weakSelf, selector);
+                    number = [NSNumber numberWithLong:func(weakSelf, selector)];
+                    type = @"long";
+                    break;
+                }
+                case 'q': {
+                    long long (*func)(id, SEL) = (void *)imp;
+                    func(weakSelf, selector);
+                    number = [NSNumber numberWithLongLong:func(weakSelf, selector)];
+                    type = @"long long";
+                    break;
+                }
+//
+//                case 'I': type = @"unsigned"; break;
+//                case 'L': type = @"unsigned long"; break;
+//                case 'C': type = @"unsigned char"; break;
+//                case 'S': type = @"unsigned short"; break;
+//                case 'Q': type = @"unsigned long long"; break;
+//                case 'B': type = @"BOOL"; break; //replacing  _Bool , change it here if you wish
+//                case 'v': type = @"void"; break;
+//                case '*': type = @"char*"; break;
+//                case ':': type = @"SEL"; break;
+//                case '#': type = @"Class"; break;
+//                case '@': type = @"id"; break;
+//                case '@?': type = @"id"; break;
+//                case 'Vv': type = @"void"; break;
+//                case 'rv': type = @"const void*"; break;
+                default: {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+                    value = [weakSelf performSelector:selector];
+#pragma clang diagnostic pop
+                    
+                };
+                    
+            }
+            if (number) {
+                insertValue = number.stringValue;
+            } else if ([value isKindOfClass:[NSString class]]) {
+                insertValue = value;
+            }
+            completedString = [NSString stringWithFormat:@"%@%@%@", completedString, insertValue, stringArray[index + 1]];
+        }
+
+    }];
+
+    return completedString;
+}
+
 
 @end

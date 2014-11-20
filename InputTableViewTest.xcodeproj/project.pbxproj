@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		60751C6F1A01FD3E00846778 /* ITConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 60751C6E1A01FD3E00846778 /* ITConstants.m */; };
 		60751C721A027E1300846778 /* ITValidationRule.m in Sources */ = {isa = PBXBuildFile; fileRef = 60751C711A027E1300846778 /* ITValidationRule.m */; };
-		60751C791A03DE1100846778 /* UIView+Frame.m in Sources */ = {isa = PBXBuildFile; fileRef = 60751C781A03DE1100846778 /* UIView+Frame.m */; };
 		60751C7F1A03E32700846778 /* ITCircleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60751C7E1A03E32700846778 /* ITCircleView.m */; };
 		607E2F7E1A001C2C00C5299A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 607E2F7D1A001C2C00C5299A /* main.m */; };
 		607E2F811A001C2C00C5299A /* ITAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 607E2F801A001C2C00C5299A /* ITAppDelegate.m */; };
@@ -20,8 +19,8 @@
 		607E2F981A001C2D00C5299A /* InputTableViewTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 607E2F971A001C2D00C5299A /* InputTableViewTestTests.m */; };
 		607E2FA31A001F9900C5299A /* ITTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 607E2FA21A001F9900C5299A /* ITTextField.m */; };
 		608528FB1A003E3F001E8C31 /* ITTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 608528FA1A003E3F001E8C31 /* ITTableViewCell.m */; };
-		608528FE1A013694001E8C31 /* ITTextFieldTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 608528FD1A013694001E8C31 /* ITTextFieldTableView.m */; };
-		608529011A0138C5001E8C31 /* ITTextObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 608529001A0138C5001E8C31 /* ITTextObject.m */; };
+		608528FE1A013694001E8C31 /* ITTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 608528FD1A013694001E8C31 /* ITTableView.m */; };
+		608529011A0138C5001E8C31 /* ITProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 608529001A0138C5001E8C31 /* ITProperty.m */; };
 		608529071A01ED1E001E8C31 /* ITTestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 608529061A01ED1E001E8C31 /* ITTestObject.m */; };
 		60A94C631A0571A600CAF887 /* ITErrorMessageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60A94C621A0571A600CAF887 /* ITErrorMessageView.m */; };
 		60A94C661A05720700CAF887 /* ITTriangleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60A94C651A05720700CAF887 /* ITTriangleView.m */; };
@@ -42,8 +41,6 @@
 		60751C6E1A01FD3E00846778 /* ITConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITConstants.m; sourceTree = "<group>"; };
 		60751C701A027E1300846778 /* ITValidationRule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITValidationRule.h; sourceTree = "<group>"; };
 		60751C711A027E1300846778 /* ITValidationRule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITValidationRule.m; sourceTree = "<group>"; };
-		60751C771A03DE1100846778 /* UIView+Frame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Frame.h"; sourceTree = "<group>"; };
-		60751C781A03DE1100846778 /* UIView+Frame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Frame.m"; sourceTree = "<group>"; };
 		60751C7D1A03E32700846778 /* ITCircleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITCircleView.h; sourceTree = "<group>"; };
 		60751C7E1A03E32700846778 /* ITCircleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITCircleView.m; sourceTree = "<group>"; };
 		607E2F781A001C2C00C5299A /* InputTableViewTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InputTableViewTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,10 +60,10 @@
 		607E2FA21A001F9900C5299A /* ITTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITTextField.m; sourceTree = "<group>"; };
 		608528F91A003E3F001E8C31 /* ITTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITTableViewCell.h; sourceTree = "<group>"; };
 		608528FA1A003E3F001E8C31 /* ITTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITTableViewCell.m; sourceTree = "<group>"; };
-		608528FC1A013694001E8C31 /* ITTextFieldTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITTextFieldTableView.h; sourceTree = "<group>"; };
-		608528FD1A013694001E8C31 /* ITTextFieldTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITTextFieldTableView.m; sourceTree = "<group>"; };
-		608528FF1A0138C5001E8C31 /* ITTextObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITTextObject.h; sourceTree = "<group>"; };
-		608529001A0138C5001E8C31 /* ITTextObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITTextObject.m; sourceTree = "<group>"; };
+		608528FC1A013694001E8C31 /* ITTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITTableView.h; sourceTree = "<group>"; };
+		608528FD1A013694001E8C31 /* ITTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITTableView.m; sourceTree = "<group>"; };
+		608528FF1A0138C5001E8C31 /* ITProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITProperty.h; sourceTree = "<group>"; };
+		608529001A0138C5001E8C31 /* ITProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITProperty.m; sourceTree = "<group>"; };
 		608529051A01ED1E001E8C31 /* ITTestObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITTestObject.h; sourceTree = "<group>"; };
 		608529061A01ED1E001E8C31 /* ITTestObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITTestObject.m; sourceTree = "<group>"; };
 		60A94C611A0571A600CAF887 /* ITErrorMessageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITErrorMessageView.h; sourceTree = "<group>"; };
@@ -129,25 +126,17 @@
 				607E2F831A001C2C00C5299A /* ITViewController.m */,
 				608529051A01ED1E001E8C31 /* ITTestObject.h */,
 				608529061A01ED1E001E8C31 /* ITTestObject.m */,
-				608528FF1A0138C5001E8C31 /* ITTextObject.h */,
-				608529001A0138C5001E8C31 /* ITTextObject.m */,
-				608528FC1A013694001E8C31 /* ITTextFieldTableView.h */,
-				608528FD1A013694001E8C31 /* ITTextFieldTableView.m */,
+				608528FF1A0138C5001E8C31 /* ITProperty.h */,
+				608529001A0138C5001E8C31 /* ITProperty.m */,
+				608528FC1A013694001E8C31 /* ITTableView.h */,
+				608528FD1A013694001E8C31 /* ITTableView.m */,
 				608528F91A003E3F001E8C31 /* ITTableViewCell.h */,
 				608528FA1A003E3F001E8C31 /* ITTableViewCell.m */,
 				607E2FA11A001F9900C5299A /* ITTextField.h */,
 				607E2FA21A001F9900C5299A /* ITTextField.m */,
-				60A94C611A0571A600CAF887 /* ITErrorMessageView.h */,
-				60A94C621A0571A600CAF887 /* ITErrorMessageView.m */,
-				60A94C641A05720700CAF887 /* ITTriangleView.h */,
-				60A94C651A05720700CAF887 /* ITTriangleView.m */,
-				60751C7D1A03E32700846778 /* ITCircleView.h */,
-				60751C7E1A03E32700846778 /* ITCircleView.m */,
-				60751C771A03DE1100846778 /* UIView+Frame.h */,
-				60751C781A03DE1100846778 /* UIView+Frame.m */,
+				60EFEC3A1A13D6D600AA0F96 /* Constants and Utilities */,
+				60EFEC391A13D6AD00AA0F96 /* ErrorMessageView */,
 				60751C731A02C47500846778 /* ValidationRules */,
-				60751C6D1A01FD3E00846778 /* ITConstants.h */,
-				60751C6E1A01FD3E00846778 /* ITConstants.m */,
 				607E2F851A001C2C00C5299A /* Main.storyboard */,
 				607E2F881A001C2C00C5299A /* Images.xcassets */,
 				607E2F8A1A001C2C00C5299A /* LaunchScreen.xib */,
@@ -180,6 +169,28 @@
 				607E2F961A001C2D00C5299A /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		60EFEC391A13D6AD00AA0F96 /* ErrorMessageView */ = {
+			isa = PBXGroup;
+			children = (
+				60A94C611A0571A600CAF887 /* ITErrorMessageView.h */,
+				60A94C621A0571A600CAF887 /* ITErrorMessageView.m */,
+				60A94C641A05720700CAF887 /* ITTriangleView.h */,
+				60A94C651A05720700CAF887 /* ITTriangleView.m */,
+			);
+			name = ErrorMessageView;
+			sourceTree = "<group>";
+		};
+		60EFEC3A1A13D6D600AA0F96 /* Constants and Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				60751C6D1A01FD3E00846778 /* ITConstants.h */,
+				60751C6E1A01FD3E00846778 /* ITConstants.m */,
+				60751C7D1A03E32700846778 /* ITCircleView.h */,
+				60751C7E1A03E32700846778 /* ITCircleView.m */,
+			);
+			name = "Constants and Utilities";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -284,7 +295,7 @@
 			files = (
 				608528FB1A003E3F001E8C31 /* ITTableViewCell.m in Sources */,
 				60751C721A027E1300846778 /* ITValidationRule.m in Sources */,
-				608529011A0138C5001E8C31 /* ITTextObject.m in Sources */,
+				608529011A0138C5001E8C31 /* ITProperty.m in Sources */,
 				607E2F841A001C2C00C5299A /* ITViewController.m in Sources */,
 				60751C6F1A01FD3E00846778 /* ITConstants.m in Sources */,
 				60A94C661A05720700CAF887 /* ITTriangleView.m in Sources */,
@@ -292,10 +303,9 @@
 				607E2FA31A001F9900C5299A /* ITTextField.m in Sources */,
 				60751C7F1A03E32700846778 /* ITCircleView.m in Sources */,
 				60A94C631A0571A600CAF887 /* ITErrorMessageView.m in Sources */,
-				608528FE1A013694001E8C31 /* ITTextFieldTableView.m in Sources */,
+				608528FE1A013694001E8C31 /* ITTableView.m in Sources */,
 				608529071A01ED1E001E8C31 /* ITTestObject.m in Sources */,
 				607E2F7E1A001C2C00C5299A /* main.m in Sources */,
-				60751C791A03DE1100846778 /* UIView+Frame.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

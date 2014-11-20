@@ -9,7 +9,6 @@
 #import "ITTextField.h"
 #import "ITConstants.h"
 #import "ITCircleView.h"
-#import "UIView+Frame.h"
 
 @interface ITTextField ()
 @property (nonatomic, strong) NSNumberFormatter *numberFormatter;
@@ -28,23 +27,28 @@ NSInteger kErrorButtonWidth = 21;
     if (self) {
         self.clipsToBounds = NO;
         self.delegate = self;
+        self.tintColor = [UIColor grayColor];
         self.numberFormatter = [NSNumberFormatter new];
         self.numberFormatter.numberStyle = NSNumberFormatterBehaviorDefault;
+        self.floatingPlaceHolderLabel = [UILabel new];
+        
         self.clearButtonMode = UITextFieldViewModeWhileEditing;
         [self addTarget:self action:@selector(textDidChange) forControlEvents:UIControlEventEditingChanged];
         [self makeErrorButton];
+        [self makeFloatingLabel];
     }
     return self;
 }
 
-- (void)setRespresentedObject:(ITTextObject *)respresentedObject {
+- (void)setRespresentedObject:(ITProperty *)respresentedObject {
     _respresentedObject = respresentedObject;
     self.placeholder = respresentedObject.propertyName;
+    self.floatingPlaceHolderLabel.text = respresentedObject.propertyName;
     if ([respresentedObject.originalValue isKindOfClass:[NSString class]]) {
         self.text = [self displayValue];
         self.keyboardType = UIKeyboardTypeDefault;
     } else if ([respresentedObject.originalValue isKindOfClass:[NSNumber class]]) {
-        self.text = [[self displayValue] stringValue];
+        self.text = ((NSNumber *)[self displayValue]).stringValue;
         self.keyboardType = UIKeyboardTypeDecimalPad;
     }
     [self hideErrorButton:!respresentedObject.displayError];
@@ -73,8 +77,8 @@ NSInteger kErrorButtonWidth = 21;
 }
 
 - (CGRect)textRectForBounds:(CGRect)bounds {
-    return CGRectMake(bounds.origin.x, bounds.origin.y,
-                      bounds.size.width - 50, bounds.size.height);
+    return CGRectMake(bounds.origin.x, bounds.origin.y + 15,
+                      bounds.size.width - 50, bounds.size.height - 15);
 }
 
 - (CGRect)editingRectForBounds:(CGRect)bounds {
@@ -85,6 +89,7 @@ NSInteger kErrorButtonWidth = 21;
     [super layoutSubviews];
     self.errorButton.frame = CGRectMake(self.frame.size.width - (kErrorButtonWidth + 5), (self.frame.size.height - kErrorButtonWidth)/2, kErrorButtonWidth, kErrorButtonWidth);
     [self.errorButton setImage:[self makeErrorImage] forState:UIControlStateNormal];
+    self.floatingPlaceHolderLabel.frame = CGRectMake(0, 0, 200, 15);
 }
 
 /////////////////////////////////////////////
@@ -95,8 +100,8 @@ NSInteger kErrorButtonWidth = 21;
     [self hideErrorButton:YES];
     self.textColor = (self.originalTextColor) ?: self.textColor;
     self.isFieldClear = NO;
-    if (self.TextFieldActivated) {
-        self.respresentedObject.currentValue = self.TextFieldActivated();
+    if (self.textFieldActivated) {
+        self.respresentedObject.currentValue = self.textFieldActivated();
         self.text = self.respresentedObject.currentValue;
         return NO;
     }
@@ -104,9 +109,9 @@ NSInteger kErrorButtonWidth = 21;
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
-    if ([self.respresentedObject.originalValue isKindOfClass:[NSString class]]) {
+    if (self.respresentedObject.representedPropertyClass == NSString.class) {
         self.respresentedObject.currentValue = textField.text;
-    } else if ([self.respresentedObject.originalValue isKindOfClass:[NSNumber class]]) {
+    } else if (self.respresentedObject.representedPropertyClass == NSNumber.class) {
         self.respresentedObject.currentValue = ([self.numberFormatter numberFromString:textField.text]);
         self.respresentedObject.isFieldClear = !(self.respresentedObject.currentValue);
     }
@@ -131,8 +136,21 @@ NSInteger kErrorButtonWidth = 21;
 }
 
 - (void)textDidChange {
-    
+
 }
+
+/////////////////////////////////////////////
+#pragma mark - Floating Label Methods
+/////////////////////////////////////////////
+
+- (void)makeFloatingLabel {
+    self.floatingPlaceHolderLabel = [UILabel new];
+    self.floatingPlaceHolderLabel.font = [UIFont systemFontOfSize:12];
+    self.floatingPlaceHolderLabel.textColor = [UIColor colorWithRed:.1 green:.2 blue:.8 alpha:1.0];
+//    self.floatingPlaceHolderLabel
+    [self addSubview:self.floatingPlaceHolderLabel];
+}
+
 
 /////////////////////////////////////////////
 #pragma mark - Error Messages
