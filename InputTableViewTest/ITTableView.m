@@ -46,7 +46,7 @@
 #pragma mark - Delegate
 /////////////////////////////////////////////
 
-- (void)customizeRepresentObject:(ITProperty *)property {
+- (void)customizeRepresentedProperty:(ITProperty *)property {
     
 }
 
@@ -64,7 +64,7 @@
         NSString *property = [properties objectAtIndex:i];
         if (self.object) {
             ITProperty *representedProperty = [ITProperty createFromProperty:property ofObject:self.object];
-            [self.propertyDelegate customizeRepresentObject:representedProperty];
+            [self.propertyDelegate customizeRepresentedProperty:representedProperty];
             [objects addObject:representedProperty];
         }
     }
@@ -72,7 +72,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    self.object = [self.propertyDelegate object];
+    self.object = [self.propertyDelegate representedObject];
     return 1;
 }
 
@@ -91,6 +91,7 @@
     cell.textField.displayMessageDelegate = tableView;
     cell.textField.indexPath = indexPath;
     cell.textField.respresentedObject = [tableView.objectProperties objectAtIndex:indexPath.row];
+    cell.textField.textFieldActivated = [tableView.propertyDelegate editingBlockForProperty:cell.textField.respresentedObject.representedProperty];
     return cell;
 }
 

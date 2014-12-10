@@ -33,7 +33,7 @@
     return @[@"firstName", @"lastName", @"age", @"homeOrMobilePhone", @"streetOne", @"streetTwo", @"streetThree", @"zip", @"city", @"state", @"country", @"dateOfBirth", @"licenseId", @"licenseState", @"licenseCountry", @"powerLevel"];
 }
 
-- (void)customizeRepresentObject:(ITProperty *)property {
+- (void)customizeRepresentedProperty:(ITProperty *)property {
         if ([property.originalValue isKindOfClass:[NSString class]] && ((NSString *)property.originalValue).length > 0) {
             ITValidationMinimumLengthRule *minimumLengthRule = [[ITValidationMinimumLengthRule alloc] init];
             minimumLengthRule.minimumLength = 2;
@@ -42,8 +42,18 @@
         }
 }
 
-- (id)object {
+- (id)representedObject {
     return [ITTestObject testObject];
+}
+
+- (ActivateBlock)editingBlockForProperty:(NSString *)property {
+    if ([property isEqualToString:@"dateOfBirth"]) {
+        return ^id(){
+
+            return nil;
+        };
+    }
+    return nil;
 }
 
 - (void)saveAction {
