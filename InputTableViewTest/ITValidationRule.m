@@ -11,29 +11,11 @@
 #import "ITConstants.h"
 #import <objc/runtime.h>
 
-@interface ITValidationRule ()
-
-@end
-
 static NSString *const kWildcard = @"%@";
 
 @implementation ITValidationRule
 
-+ (ITValidationRule *)upperCaseOnlyRule {
-    ITValidationRule *upperCaseOnlyRule = [ITValidationRule new];
-    upperCaseOnlyRule.textShouldChangeAtRange = [self makeSpecificCaseBlockForUpperCase:YES];
-    
-    return upperCaseOnlyRule;
-}
-
-+ (ITValidationRule *)lowerCaseOnlyRule {
-    ITValidationRule *lowerCaseOnlyRule = [ITValidationRule new];
-    lowerCaseOnlyRule.textShouldChangeAtRange = [self makeSpecificCaseBlockForUpperCase:NO];
-    
-    return lowerCaseOnlyRule;
-}
-
-+ (TextShouldChangeAtRange)makeSpecificCaseBlockForUpperCase:(BOOL)upperCase {
+- (TextShouldChangeAtRange)makeSpecificCaseBlockForUpperCase:(BOOL)upperCase {
     __block BOOL isUpperCase = upperCase;
     return ^BOOL(UITextField *textField, NSString *newText, NSRange range){
         newText = (isUpperCase) ? [newText uppercaseString] : [newText lowercaseString];
@@ -49,31 +31,6 @@ static NSString *const kWildcard = @"%@";
     };
 }
 
-+ (ITValidationRule *)minimumLengthRule {
-    ITValidationRule *minimumLengthRule = [ITValidationRule new];
-    minimumLengthRule.errorMessageTemplate = @"Text must be at least %@ characters";
-    minimumLengthRule.errorMessageParameters = @[@"minimumLength"];
-    blockVar(minimumLengthRule, weakMinimunRule)
-    minimumLengthRule.validationError = ^BOOL(id value) {
-        if ([value isKindOfClass:[NSString class]]) {
-            return (((NSString *)value).length <= weakMinimunRule.minimumLength);
-        } else if ([value isKindOfClass:[NSNumber class]]) {
-            return (((NSNumber *)value).stringValue.length < weakMinimunRule.minimumLength);
-        }
-        return YES;
-    };
-    return minimumLengthRule;
-}
-
-+ (ITValidationRule *)maximumLengthRule {
-    ITValidationRule *maximumLengthRule = [ITValidationRule new];
-    blockVar(maximumLengthRule, weakMaximumRule)
-    maximumLengthRule.textShouldChangeAtRange = ^BOOL(UITextField *textField, NSString *newText, NSRange range){
-        return (textField.text.length < weakMaximumRule.maximumLength);
-    };
-    return maximumLengthRule;
-}
-
 /**
  *  Creates a string from the template inserting wildcards at the specifier. The reason for this method is to create the string at runtime with the specified properties.
  */
@@ -86,46 +43,37 @@ static NSString *const kWildcard = @"%@";
     __block NSString *completedString = stringArray.firstObject;
     blockVar(self, weakSelf);
     [self.errorMessageParameters enumerateObjectsUsingBlock:^(NSString *wildcard, NSUInteger index, BOOL *stop) {
-        
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-#pragma clang diagnostic pop
-    
-        
         SEL selector = NSSelectorFromString(wildcard);
         IMP imp = [weakSelf methodForSelector:selector];
         
         NSString *insertValue = @"";
         id value;
         
-        if ([weakSelf respondsToSelector:selector]) {
-            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
-                                        [[weakSelf class] instanceMethodSignatureForSelector:selector]];
-            [invocation setSelector:selector];
-            [invocation setTarget:weakSelf];
-            [invocation invoke];
-            void *returnValue;
-            [invocation getReturnValue:&returnValue];
-        }
+//        if ([weakSelf respondsToSelector:selector]) {
+//            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:
+//                                        [[weakSelf class] instanceMethodSignatureForSelector:selector]];
+//            [invocation setSelector:selector];
+//            [invocation setTarget:weakSelf];
+//            [invocation invoke];
+//            void *returnValue;
+//            [invocation getReturnValue:&returnValue];
+//        }
         
         if ([weakSelf respondsToSelector:selector]) {
             Method method = class_getInstanceMethod([weakSelf class], selector);
             char *returnType = method_copyReturnType(method);
 //            NSString* propertyType = [NSString stringWithFormat:@"%s", returnType];
             char character = returnType[0];
-            NSString *type;
             NSNumber *number;
             switch (character){
                     
                 case 'd': {
-                    //type = @"double";
                     double (*func)(id, SEL) = (void *)imp;
                     func(weakSelf, selector);
                     number = [NSNumber numberWithDouble:func(weakSelf, selector)];
                     break;
                 }
                 case 'i': {
-                    //type = @"int";
                     int (*func)(id, SEL) = (void *)imp;
                     func(weakSelf, selector);
                     number = [NSNumber numberWithDouble:func(weakSelf, selector)];
@@ -133,7 +81,6 @@ static NSString *const kWildcard = @"%@";
                 }
                     break;
                 case 'f': {
-                    type = @"float";
                     int (*func)(id, SEL) = (void *)imp;
                     func(weakSelf, selector);
                     number = [NSNumber numberWithDouble:func(weakSelf, selector)];
@@ -146,14 +93,12 @@ static NSString *const kWildcard = @"%@";
                     long (*func)(id, SEL) = (void *)imp;
                     func(weakSelf, selector);
                     number = [NSNumber numberWithLong:func(weakSelf, selector)];
-                    type = @"long";
                     break;
                 }
                 case 'q': {
                     long long (*func)(id, SEL) = (void *)imp;
                     func(weakSelf, selector);
                     number = [NSNumber numberWithLongLong:func(weakSelf, selector)];
-                    type = @"long long";
                     break;
                 }
 //
@@ -178,7 +123,6 @@ static NSString *const kWildcard = @"%@";
 #pragma clang diagnostic pop
                     
                 };
-                    
             }
             if (number) {
                 insertValue = number.stringValue;

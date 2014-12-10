@@ -18,7 +18,7 @@ typedef id (^ActivateBlock)();
 @end
 
 @interface ITTextField : UITextField <UITextFieldDelegate>
-@property (nonatomic, weak) id <ITDisplayErrorMessageDelegate> displayMessageDelete;
+@property (nonatomic, weak) id <ITDisplayErrorMessageDelegate> displayMessageDelegate;
 @property (nonatomic, strong) NSIndexPath *indexPath;
 @property (nonatomic, strong) ITProperty *respresentedObject;
 @property (nonatomic, copy) ActivateBlock textFieldActivated;

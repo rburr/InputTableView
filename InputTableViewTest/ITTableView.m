@@ -11,12 +11,14 @@
 #import "ITTableViewCell.h"
 #import "ITConstants.h"
 
-@interface ITTableView ()
+@interface ITTableView () <UITableViewDataSource, UITableViewDelegate>
 //@property (nonatomic, strong) NSArray *objects;
 @property (nonatomic, strong) NSArray *objectProperties;
 @property (nonatomic) UIEdgeInsets originalEdgeInsets;
+@property (nonatomic) NSValue *originalContentOffset;
 @property (nonatomic, strong) NSMutableArray *errorMessages;
 @property (nonatomic) BOOL fieldHasError;
+@property (nonatomic, strong) id object;
 
 @end
 
@@ -29,12 +31,67 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyBoardWillHide:) name:UIKeyboardWillHideNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(activateNextTextField:) name:kTextFieldShouldReturn object:nil];
+        self.delegate = self;
+        self.dataSource = self;
     }
     return self;
 }
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+
+/////////////////////////////////////////////
+#pragma mark - Delegate
+/////////////////////////////////////////////
+
+- (void)customizeRepresentObject:(ITProperty *)property {
+    
+}
+
+/////////////////////////////////////////////
+#pragma mark - TableView Delegate and Datasource
+/////////////////////////////////////////////
+
+- (NSArray *)properties {
+    return [self.propertyDelegate displayedProperties];
+}
+
+- (NSArray *)createRepresentedProperties:(NSArray *)properties {
+    NSMutableArray *objects = [NSMutableArray new];
+    for (int i = 0; i < properties.count; i++) {
+        NSString *property = [properties objectAtIndex:i];
+        if (self.object) {
+            ITProperty *representedProperty = [ITProperty createFromProperty:property ofObject:self.object];
+            [self.propertyDelegate customizeRepresentObject:representedProperty];
+            [objects addObject:representedProperty];
+        }
+    }
+    return [NSArray arrayWithArray:objects];
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    self.object = [self.propertyDelegate object];
+    return 1;
+}
+
+- (NSInteger)tableView:(ITTableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    NSArray *properties = [self properties];
+    tableView.objectProperties = [self createRepresentedProperties:properties];
+    return properties.count;
+}
+
+- (UITableViewCell *)tableView:(ITTableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    static NSString *cellIdentifer = @"ITTableViewCellIdentifer";
+    ITTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifer];
+    if (cell == nil) {
+        cell = [ITTableViewCell new];
+    }
+    cell.textField.displayMessageDelegate = tableView;
+    cell.textField.indexPath = indexPath;
+    cell.textField.respresentedObject = [tableView.objectProperties objectAtIndex:indexPath.row];
+    return cell;
 }
 
 /////////////////////////////////////////////
@@ -86,8 +143,6 @@
 /////////////////////////////////////////////
 
 - (void)displayErroMessageAtIndexPath:(NSIndexPath *)indexPath {
-    
-    
     ITErrorMessageView *errorMessageView = [ITErrorMessageView new];
     errorMessageView.indexPath = indexPath;
     ITTableViewCell *cell = (ITTableViewCell *)[self cellForRowAtIndexPath:indexPath];
@@ -106,18 +161,22 @@
     errorMessageView.messageLabel.text = [self errorMessageList:indexPath];
     CGPoint cellPosition = [self.superview convertPoint:cell.frame.origin toView:nil];
     CGPoint buttonPosition = [cell convertPoint:cell.textField.errorButton.frame.origin toView:nil];
-    if (buttonPosition.y - self.contentInset.top > (15 + paragraphRect.size.height)) {
-        //switch view to bottom
+    errorMessageView.frame = CGRectMake(buttonPosition.x - 200, cellPosition.y - (15 + paragraphRect.size.height), messageViewWidth, paragraphRect.size.height + 10);
+
+    if (buttonPosition.y - self.contentInset.top < (25 + paragraphRect.size.height)) {
+        self.originalContentOffset = [NSValue valueWithCGPoint:self.contentOffset];
+        CGRect visibleFrame = errorMessageView.frame;
+        visibleFrame.origin.y -= 10;
+        [self scrollRectToVisible:visibleFrame animated:YES];
     }
     
-    errorMessageView.frame = CGRectMake(buttonPosition.x - 200, cellPosition.y - (15 + paragraphRect.size.height), messageViewWidth, paragraphRect.size.height + 10);
     [self addSubview:errorMessageView];
     [self.errorMessages addObject:errorMessageView];
 }
 
 
 - (NSString *)errorMessageList:(NSIndexPath *)indexPath {
-    ITProperty *textObject = self.textObjects[indexPath.row];
+    ITProperty *textObject = self.objectProperties[indexPath.row];
     NSString *errorList = @"";
     for (ITValidationRule *rule in textObject.validationRules) {
         errorList =  (errorList.length > 0) ? [NSString stringWithFormat:@"%@\n%@", errorList, [rule errorMessage]] : [rule errorMessage];
@@ -133,12 +192,16 @@
         }
     }
     [viewToBeRemoved removeFromSuperview];
+    if (self.originalContentOffset) {
+        [self setContentOffset:self.originalContentOffset.CGPointValue animated:YES];
+        self.originalContentOffset = nil;
+    }
 }
 
 - (void)checkAndDisplayValidationErrors {
     [self endEditing:YES];
     blockVar(self, weakSelf)
-    [self.textObjects enumerateObjectsUsingBlock:^(ITProperty *object, NSUInteger index, BOOL *stop) {
+    [self.objectProperties enumerateObjectsUsingBlock:^(ITProperty *object, NSUInteger index, BOOL *stop) {
         if ([object hasErrorMessage]) {
             ITTableViewCell *cell = (ITTableViewCell *)[weakSelf cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
             [cell.textField displayErrorButton];
@@ -154,7 +217,7 @@
 /////////////////////////////////////////////
 
 - (BOOL)textObjectsHaveChanged {
-    for (ITProperty *object in self.textObjects) {
+    for (ITProperty *object in self.objectProperties) {
         if ([object.currentValue isKindOfClass:[NSString class]]) {
             if (![object.currentValue isEqualToString:object.originalValue]) {
                 return YES;
@@ -174,7 +237,7 @@
 }
 
 - (void)updateObject {
-    for (ITProperty *textObject in self.textObjects) {
+    for (ITProperty *textObject in self.objectProperties) {
         [self.object setValue:textObject.currentValue forKey:textObject.representedProperty];
     }
 }

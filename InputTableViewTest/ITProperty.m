@@ -71,4 +71,18 @@
     return nil;
 }
 
+- (void)addValidationRules:(NSSet *)newRules {
+    NSMutableSet *currentRules = [self.validationRules mutableCopy];
+
+    for (ITValidationRule *newRule in newRules) {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"class == %@", [newRule class]];
+        NSSet *duplicates = [self.validationRules filteredSetUsingPredicate:predicate];
+        for (ITValidationRule *duplicateRule in duplicates) {
+            [currentRules removeObject:duplicateRule];
+        }
+        [currentRules addObject:newRule];
+    }
+    self.validationRules = [NSSet setWithSet:currentRules];
+}
+
 @end

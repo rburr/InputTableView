@@ -10,10 +10,10 @@
 #import "ITTableViewCell.h"
 #import "ITTestObject.h"
 #import "ITTableView.h"
-#import "ITValidationRule.h"
+#import "ITDefaultValidationRules.h"
 #import "ITConstants.h"
 
-@interface ITViewController () <UITableViewDataSource, UITableViewDelegate>
+@interface ITViewController () <ITTableViewDelegate>
 @property (nonatomic, strong) ITTableView *tableView;
 @end
 
@@ -24,45 +24,26 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStylePlain target:self action:@selector(saveAction)];
     self.view.backgroundColor = [UIColor whiteColor];
     self.tableView = [ITTableView new];
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
+    self.tableView.propertyDelegate = self;
     self.tableView.frame = self.view.frame;
     [self.view addSubview:self.tableView];
 }
 
-- (NSArray *)properties {
+- (NSArray *)displayedProperties {
     return @[@"firstName", @"lastName", @"age", @"homeOrMobilePhone", @"streetOne", @"streetTwo", @"streetThree", @"zip", @"city", @"state", @"country", @"dateOfBirth", @"licenseId", @"licenseState", @"licenseCountry", @"powerLevel"];
 }
 
-- (NSArray *)textObjects:(NSInteger)count {
-    NSMutableArray *objects = [NSMutableArray new];
-    for (int i = 0; i < count; i++) {
-        NSString *property = [[self properties] objectAtIndex:i];
-        ITTestObject *object = [ITTestObject testObject];
-        ITProperty *textObject = [ITProperty createFromProperty:property ofObject:object];
-        ITValidationRule *rule = [ITValidationRule minimumLengthRule];
-        rule.minimumLength = 1;
-        textObject.validationRules = @[rule];
-        [objects addObject:textObject];
-    }
-    return [NSArray arrayWithArray:objects];
+- (void)customizeRepresentObject:(ITProperty *)property {
+        if ([property.originalValue isKindOfClass:[NSString class]] && ((NSString *)property.originalValue).length > 0) {
+            ITValidationMinimumLengthRule *minimumLengthRule = [[ITValidationMinimumLengthRule alloc] init];
+            minimumLengthRule.minimumLength = 2;
+            ITValidationRequiredRule *requiredRule = [[ITValidationRequiredRule alloc] init];
+            property.validationRules = $(minimumLengthRule, requiredRule);
+        }
 }
 
-- (NSInteger)tableView:(ITTableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    tableView.textObjects = [self textObjects:[self properties].count];
-    return [self properties].count;
-}
-
-- (UITableViewCell *)tableView:(ITTableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *cellIdentifer = @"ITTableViewCellIdentifer";
-    ITTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifer];
-    if (cell == nil) {
-        cell = [ITTableViewCell new];
-    }
-    cell.textField.displayMessageDelete = tableView;
-    cell.textField.indexPath = indexPath;
-    cell.textField.respresentedObject = [tableView.textObjects objectAtIndex:indexPath.row];    
-    return cell;
+- (id)object {
+    return [ITTestObject testObject];
 }
 
 - (void)saveAction {
@@ -70,7 +51,6 @@
     
     if ([self.tableView shouldUpdate]) {
         [self.tableView updateObject];
-//        [self.tableView reloadData];
     } else {
         [self.tableView updateObject];
         

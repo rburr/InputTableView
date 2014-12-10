@@ -9,12 +9,14 @@
 #import "ITTextField.h"
 #import "ITConstants.h"
 #import "ITCircleView.h"
+#import "ITDefaultValidationRules.h"
 
 @interface ITTextField ()
 @property (nonatomic, strong) NSNumberFormatter *numberFormatter;
 @property (nonatomic, strong) UIColor *originalTextColor;
 @property (nonatomic) BOOL isFieldClear;
 @property (nonatomic) BOOL isErrorMessageDisplayed;
+@property (nonatomic) BOOL isRequiredField;
 
 @end
 
@@ -44,6 +46,13 @@ NSInteger kErrorButtonWidth = 21;
     _respresentedObject = respresentedObject;
     self.placeholder = respresentedObject.propertyName;
     self.floatingPlaceHolderLabel.text = respresentedObject.propertyName;
+    
+    NSPredicate *validationRulePredicate = [NSPredicate predicateWithFormat:@"class == %@", [ITValidationRequiredRule class]];
+    self.isRequiredField = ([respresentedObject.validationRules filteredSetUsingPredicate:validationRulePredicate].count > 0);
+    if (self.isRequiredField) {
+        [self requiredIndicator];
+    }
+    
     if ([respresentedObject.originalValue isKindOfClass:[NSString class]]) {
         self.text = [self displayValue];
         self.keyboardType = UIKeyboardTypeDefault;
@@ -77,8 +86,7 @@ NSInteger kErrorButtonWidth = 21;
 }
 
 - (CGRect)textRectForBounds:(CGRect)bounds {
-    return CGRectMake(bounds.origin.x, bounds.origin.y + 15,
-                      bounds.size.width - 50, bounds.size.height - 15);
+    return CGRectMake(bounds.origin.x, bounds.origin.y + 15, bounds.size.width - 50, bounds.size.height - 15);
 }
 
 - (CGRect)editingRectForBounds:(CGRect)bounds {
@@ -98,7 +106,10 @@ NSInteger kErrorButtonWidth = 21;
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
     [self hideErrorButton:YES];
+    
     self.textColor = (self.originalTextColor) ?: self.textColor;
+    self.floatingPlaceHolderLabel.textColor = [UIColor colorWithRed:.1 green:.2 blue:.8 alpha:1.0];
+    
     self.isFieldClear = NO;
     if (self.textFieldActivated) {
         self.respresentedObject.currentValue = self.textFieldActivated();
@@ -111,9 +122,11 @@ NSInteger kErrorButtonWidth = 21;
 - (void)textFieldDidEndEditing:(UITextField *)textField {
     if (self.respresentedObject.representedPropertyClass == NSString.class) {
         self.respresentedObject.currentValue = textField.text;
+        
     } else if (self.respresentedObject.representedPropertyClass == NSNumber.class) {
         self.respresentedObject.currentValue = ([self.numberFormatter numberFromString:textField.text]);
         self.respresentedObject.isFieldClear = !(self.respresentedObject.currentValue);
+        
     }
 }
 
@@ -147,10 +160,14 @@ NSInteger kErrorButtonWidth = 21;
     self.floatingPlaceHolderLabel = [UILabel new];
     self.floatingPlaceHolderLabel.font = [UIFont systemFontOfSize:12];
     self.floatingPlaceHolderLabel.textColor = [UIColor colorWithRed:.1 green:.2 blue:.8 alpha:1.0];
-//    self.floatingPlaceHolderLabel
     [self addSubview:self.floatingPlaceHolderLabel];
 }
 
+
+- (void)requiredIndicator {
+    self.floatingPlaceHolderLabel.font = [UIFont boldSystemFontOfSize:self.floatingPlaceHolderLabel.font.pointSize];
+    self.floatingPlaceHolderLabel.text = [NSString stringWithFormat:@"%@*", self.floatingPlaceHolderLabel.text];
+}
 
 /////////////////////////////////////////////
 #pragma mark - Error Messages
@@ -190,10 +207,10 @@ NSInteger kErrorButtonWidth = 21;
 
 - (void)displayErrorMessage {
     if (self.isErrorMessageDisplayed) {
-        [self.displayMessageDelete removeErrorMessageAtIndexPath:self.indexPath];
+        [self.displayMessageDelegate removeErrorMessageAtIndexPath:self.indexPath];
         self.isErrorMessageDisplayed = NO;
     } else {
-        [self.displayMessageDelete displayErroMessageAtIndexPath:self.indexPath];
+        [self.displayMessageDelegate displayErroMessageAtIndexPath:self.indexPath];
         self.isErrorMessageDisplayed = YES;
     }
 }
@@ -202,13 +219,14 @@ NSInteger kErrorButtonWidth = 21;
     [self hideErrorButton:NO];
     self.originalTextColor = self.textColor;
     self.textColor = (self.errorTextColor) ?: [UIColor redColor];
+    self.floatingPlaceHolderLabel.textColor = (self.errorTextColor) ?: [UIColor redColor];
 }
 
 - (void)hideErrorButton:(BOOL)hide {
     self.errorButton.hidden = hide;
     if (hide) {
         self.respresentedObject.displayError = NO;
-        [self.displayMessageDelete removeErrorMessageAtIndexPath:self.indexPath];
+        [self.displayMessageDelegate removeErrorMessageAtIndexPath:self.indexPath];
     }
 }
 

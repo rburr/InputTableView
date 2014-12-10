@@ -13,5 +13,6 @@
 FOUNDATION_EXPORT NSString *const kTextFieldShouldReturn;
 
 #define blockVar(object, weakObject) __weak typeof(object) weakObject = object;
+#define $(...)  [NSSet setWithObjects:__VA_ARGS__, nil]
 
 @end

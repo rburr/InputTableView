@@ -15,6 +15,7 @@ typedef BOOL (^ValidationError)(id currentValue);
 @interface ITValidationRule : NSObject
 @property (copy) TextShouldChangeAtRange textShouldChangeAtRange;
 @property (copy) ValidationError validationError;
+
 /**
  *  Error message string template.
  */
@@ -23,14 +24,10 @@ typedef BOOL (^ValidationError)(id currentValue);
  *  An Array of NSStrings which should be selectors that the ITValidationRule instanceType can perform.
  */
 @property (nonatomic, strong) NSArray *errorMessageParameters;
-@property (nonatomic) NSInteger minimumLength;
-@property (nonatomic) NSInteger maximumLength;
-
-+ (ITValidationRule *)upperCaseOnlyRule;
-+ (ITValidationRule *)lowerCaseOnlyRule;
-+ (ITValidationRule *)maximumLengthRule;
-+ (ITValidationRule *)minimumLengthRule;
 
 - (NSString *)errorMessage;
+
+// Subclass methods
+- (TextShouldChangeAtRange)makeSpecificCaseBlockForUpperCase:(BOOL)upperCase;
 
 @end

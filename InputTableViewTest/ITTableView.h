@@ -8,14 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "ITTextField.h"
+#import "ITProperty.h"
 
 @protocol ITTableViewDelegate <NSObject, UIScrollViewDelegate>
-//- (NSArray *)displayedObjects;
 //- (NSArray *)displayedPropertiesForObject:(id)sectionObject;
 //- (NSArray *)validationRulesForProperty:(NSString *)property object:(id)sectionObject;
 
+- (id)object;
 - (NSArray *)displayedProperties;
-- (NSArray *)validationRulesForProperty:(NSString *)property;
+- (void)customizeRepresentObject:(ITProperty *)property;
 
 @optional
 - (ActivateBlock)blockForProperty:(NSString *)property;
@@ -24,8 +25,7 @@
 @end
 
 @interface ITTableView : UITableView <ITDisplayErrorMessageDelegate>
-@property (nonatomic, strong) NSArray *textObjects;
-@property (nonatomic, strong) id object;
+@property (nonatomic, weak) id <ITTableViewDelegate> propertyDelegate;
 - (void)checkAndDisplayValidationErrors;
 - (BOOL)shouldUpdate;
 - (void)updateObject;

@@ -1,9 +1,10 @@
-1. 	a.error message view should resize its height up
+#1. 	a.error message view should resize its height up
 	b. error message view should appear below the cell if the height will not completely fit in the view
+	- scrollView should now scroll down to display the entire error.
 	
 2. Fix the reload tableview error that reverts the textfields to their original form
 3. add a discard changes button
-4. Add a floating label for placeholder values
-5. Add a required field indicator
-6. Conform TableView or scrollview class to new protocol
+#4. Add a floating label for placeholder values
+#5. Add a required field indicator
+#6. Conform TableView or scrollview class to new protocol
 7. Add Editing block to validation rule instead of delegate

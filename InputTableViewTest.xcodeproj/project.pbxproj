@@ -22,6 +22,7 @@
 		608528FE1A013694001E8C31 /* ITTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 608528FD1A013694001E8C31 /* ITTableView.m */; };
 		608529011A0138C5001E8C31 /* ITProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 608529001A0138C5001E8C31 /* ITProperty.m */; };
 		608529071A01ED1E001E8C31 /* ITTestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 608529061A01ED1E001E8C31 /* ITTestObject.m */; };
+		609962381A1E7C7F0044E0A7 /* ITDefaultValidationRules.m in Sources */ = {isa = PBXBuildFile; fileRef = 609962371A1E7C7F0044E0A7 /* ITDefaultValidationRules.m */; };
 		60A94C631A0571A600CAF887 /* ITErrorMessageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60A94C621A0571A600CAF887 /* ITErrorMessageView.m */; };
 		60A94C661A05720700CAF887 /* ITTriangleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60A94C651A05720700CAF887 /* ITTriangleView.m */; };
 /* End PBXBuildFile section */
@@ -66,6 +67,8 @@
 		608529001A0138C5001E8C31 /* ITProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITProperty.m; sourceTree = "<group>"; };
 		608529051A01ED1E001E8C31 /* ITTestObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITTestObject.h; sourceTree = "<group>"; };
 		608529061A01ED1E001E8C31 /* ITTestObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITTestObject.m; sourceTree = "<group>"; };
+		609962361A1E7C7F0044E0A7 /* ITDefaultValidationRules.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITDefaultValidationRules.h; sourceTree = "<group>"; };
+		609962371A1E7C7F0044E0A7 /* ITDefaultValidationRules.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITDefaultValidationRules.m; sourceTree = "<group>"; };
 		60A94C611A0571A600CAF887 /* ITErrorMessageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITErrorMessageView.h; sourceTree = "<group>"; };
 		60A94C621A0571A600CAF887 /* ITErrorMessageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ITErrorMessageView.m; sourceTree = "<group>"; };
 		60A94C641A05720700CAF887 /* ITTriangleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ITTriangleView.h; sourceTree = "<group>"; };
@@ -95,6 +98,8 @@
 			children = (
 				60751C701A027E1300846778 /* ITValidationRule.h */,
 				60751C711A027E1300846778 /* ITValidationRule.m */,
+				609962361A1E7C7F0044E0A7 /* ITDefaultValidationRules.h */,
+				609962371A1E7C7F0044E0A7 /* ITDefaultValidationRules.m */,
 			);
 			name = ValidationRules;
 			sourceTree = "<group>";
@@ -301,6 +306,7 @@
 				60A94C661A05720700CAF887 /* ITTriangleView.m in Sources */,
 				607E2F811A001C2C00C5299A /* ITAppDelegate.m in Sources */,
 				607E2FA31A001F9900C5299A /* ITTextField.m in Sources */,
+				609962381A1E7C7F0044E0A7 /* ITDefaultValidationRules.m in Sources */,
 				60751C7F1A03E32700846778 /* ITCircleView.m in Sources */,
 				60A94C631A0571A600CAF887 /* ITErrorMessageView.m in Sources */,
 				608528FE1A013694001E8C31 /* ITTableView.m in Sources */,
