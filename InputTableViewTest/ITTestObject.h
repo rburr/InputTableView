@@ -20,7 +20,7 @@
 @property (nonatomic, strong) NSString *city;
 @property (nonatomic, strong) NSString *state;
 @property (nonatomic, strong) NSString *country;
-@property (nonatomic, strong) NSString *dateOfBirth;
+@property (nonatomic, strong) NSDate *dateOfBirth;
 @property (nonatomic, strong) NSString *licenseId;
 @property (nonatomic, strong) NSString *licenseState;
 @property (nonatomic, strong) NSString *licenseCountry;

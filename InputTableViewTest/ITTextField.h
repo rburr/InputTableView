@@ -9,7 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "ITProperty.h"
 
-typedef id (^ActivateBlock)();
+typedef void (^TerminationBlock)(id newValue);
+typedef void (^ActivateBlock)(TerminationBlock terminationBlock);
+//typedef void (^ActivateBlock)(SEL updateValue);
+
 
 @protocol ITDisplayErrorMessageDelegate <NSObject>
 - (void)displayErroMessageAtIndexPath:(NSIndexPath *)indexPath;
@@ -20,13 +23,20 @@ typedef id (^ActivateBlock)();
 @interface ITTextField : UITextField <UITextFieldDelegate>
 @property (nonatomic, weak) id <ITDisplayErrorMessageDelegate> displayMessageDelegate;
 @property (nonatomic, strong) NSIndexPath *indexPath;
-@property (nonatomic, strong) ITProperty *respresentedObject;
+@property (nonatomic, strong) ITProperty *representedObject;
 @property (nonatomic, copy) ActivateBlock textFieldActivated;
-@property (nonatomic) NSNumberFormatterStyle numberFormatStyle;
+@property (nonatomic, copy) TerminationBlock terminationBlock;
+@property (nonatomic, strong) NSNumberFormatter *numberFormatter;
+@property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) UIColor *errorTextColor;
 @property (nonatomic, strong) UIButton *errorButton;
 @property (nonatomic, strong) UILabel *floatingPlaceHolderLabel;
+@property (nonatomic) BOOL isErrorMessageDisplayed;
 
 - (void)displayErrorButton;
+
+
+- (void)updateTerminationBlock:(TerminationBlock)terminationBlock;
+- (void)updateTextFieldActivated:(ActivateBlock)textFieldActivated;
 
 @end

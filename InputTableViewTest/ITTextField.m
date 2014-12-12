@@ -11,12 +11,15 @@
 #import "ITCircleView.h"
 #import "ITDefaultValidationRules.h"
 
+static NSString *const kActivationBlockCompleted = @"kTextFieldActivationBlockCompleted";
+static NSString *const kTerminationBlockCompleted = @"kTextFieldTerminationBlockCompleted";
+
+
 @interface ITTextField ()
-@property (nonatomic, strong) NSNumberFormatter *numberFormatter;
 @property (nonatomic, strong) UIColor *originalTextColor;
 @property (nonatomic) BOOL isFieldClear;
-@property (nonatomic) BOOL isErrorMessageDisplayed;
 @property (nonatomic) BOOL isRequiredField;
+@property (nonatomic) BOOL isActivationBlockActive;
 
 @end
 
@@ -30,8 +33,6 @@ NSInteger kErrorButtonWidth = 21;
         self.clipsToBounds = NO;
         self.delegate = self;
         self.tintColor = [UIColor grayColor];
-        self.numberFormatter = [NSNumberFormatter new];
-        self.numberFormatter.numberStyle = NSNumberFormatterBehaviorDefault;
         self.floatingPlaceHolderLabel = [UILabel new];
         
         self.clearButtonMode = UITextFieldViewModeWhileEditing;
@@ -42,8 +43,8 @@ NSInteger kErrorButtonWidth = 21;
     return self;
 }
 
-- (void)setRespresentedObject:(ITProperty *)respresentedObject {
-    _respresentedObject = respresentedObject;
+- (void)setRepresentedObject:(ITProperty *)respresentedObject {
+    _representedObject = respresentedObject;
     self.placeholder = respresentedObject.propertyName;
     self.floatingPlaceHolderLabel.text = respresentedObject.propertyName;
     
@@ -53,26 +54,24 @@ NSInteger kErrorButtonWidth = 21;
         [self requiredIndicator];
     }
     
-    if ([respresentedObject.originalValue isKindOfClass:[NSString class]]) {
+    if (respresentedObject.representedPropertyClass == [NSString class]) {
         self.text = [self displayValue];
         self.keyboardType = UIKeyboardTypeDefault;
-    } else if ([respresentedObject.originalValue isKindOfClass:[NSNumber class]]) {
+    } else if (respresentedObject.representedPropertyClass == [NSNumber class]) {
         self.text = ((NSNumber *)[self displayValue]).stringValue;
         self.keyboardType = UIKeyboardTypeDecimalPad;
+    } else if (respresentedObject.representedPropertyClass == [NSDate class]) {
+        self.text = [self.dateFormatter stringFromDate:[self displayValue]];
     }
     [self hideErrorButton:!respresentedObject.displayError];
 }
 
 - (id)displayValue {
-    if (self.respresentedObject.isFieldClear) {
-        self.respresentedObject.currentValue = nil;
+    if (self.representedObject.isFieldClear) {
+        self.representedObject.currentValue = nil;
         return nil;
     }
-    return (self.respresentedObject.currentValue) ?: self.respresentedObject.originalValue;
-}
-
-- (void)setNumberFormatStyle:(NSNumberFormatterStyle)numberFormatStyle {
-    self.numberFormatter.numberStyle = numberFormatStyle;
+    return (self.representedObject.currentValue) ?: self.representedObject.originalValue;
 }
 
 /////////////////////////////////////////////
@@ -101,6 +100,32 @@ NSInteger kErrorButtonWidth = 21;
 }
 
 /////////////////////////////////////////////
+#pragma mark - Block Methods
+/////////////////////////////////////////////
+
+- (void)updateTextFieldActivated:(ActivateBlock)textFieldActivated {
+    blockVar(self, weakSelf);
+    if (textFieldActivated) {
+    self.textFieldActivated = [^(TerminationBlock block) {
+        if (block) {
+            textFieldActivated(block);
+        }
+        weakSelf.isActivationBlockActive = YES;
+    } copy];
+    }
+}
+
+- (void)updateTerminationBlock:(TerminationBlock)terminationBlock {
+    blockVar(self, weakSelf);
+    if (terminationBlock) {
+    self.terminationBlock = [^(id value) {
+        terminationBlock(value);
+        weakSelf.isActivationBlockActive = NO;
+    } copy];
+    }
+}
+
+/////////////////////////////////////////////
 #pragma mark - Delegate Methods
 /////////////////////////////////////////////
 
@@ -112,27 +137,28 @@ NSInteger kErrorButtonWidth = 21;
     
     self.isFieldClear = NO;
     if (self.textFieldActivated) {
-        self.respresentedObject.currentValue = self.textFieldActivated();
-        self.text = self.respresentedObject.currentValue;
+        if (!self.isActivationBlockActive) {
+            self.textFieldActivated(self.terminationBlock);
+        }
         return NO;
     }
     return YES;
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
-    if (self.respresentedObject.representedPropertyClass == NSString.class) {
-        self.respresentedObject.currentValue = textField.text;
+    if (self.representedObject.representedPropertyClass == NSString.class) {
+        self.representedObject.currentValue = textField.text;
         
-    } else if (self.respresentedObject.representedPropertyClass == NSNumber.class) {
-        self.respresentedObject.currentValue = ([self.numberFormatter numberFromString:textField.text]);
-        self.respresentedObject.isFieldClear = !(self.respresentedObject.currentValue);
+    } else if (self.representedObject.representedPropertyClass == NSNumber.class) {
+        self.representedObject.currentValue = ([self.numberFormatter numberFromString:textField.text]);
+        self.representedObject.isFieldClear = !(self.representedObject.currentValue);
         
     }
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     BOOL shouldChangeCharacters = YES;
-    for (ITValidationRule *rule in self.respresentedObject.validationRules) {
+    for (ITValidationRule *rule in self.representedObject.validationRules) {
         if (rule.textShouldChangeAtRange) {
             if (!rule.textShouldChangeAtRange(textField, string, range)) {
                 shouldChangeCharacters = NO;
@@ -225,7 +251,7 @@ NSInteger kErrorButtonWidth = 21;
 - (void)hideErrorButton:(BOOL)hide {
     self.errorButton.hidden = hide;
     if (hide) {
-        self.respresentedObject.displayError = NO;
+        self.representedObject.displayError = NO;
         [self.displayMessageDelegate removeErrorMessageAtIndexPath:self.indexPath];
     }
 }

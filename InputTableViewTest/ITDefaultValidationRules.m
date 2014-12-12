@@ -83,8 +83,10 @@
                 return (((NSString *)value).length == 0);
             } else if ([value isKindOfClass:[NSNumber class]]) {
                 return (((NSNumber *)value).stringValue.length == 0);
+            } else if ([value isKindOfClass:[NSDate class]]) {
+                return !value;
             }
-            return NO;
+            return YES;
         };
     }
     return self;

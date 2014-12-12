@@ -54,4 +54,13 @@
    return (self.presentingButton.frame.origin.x - self.frame.origin.x + (30 - self.presentingButton.frame.size.width)) ?: self.frame.size.width - 25;
 }
 
+- (void)updateIndexPath:(NSIndexPath *)indexPath {
+    self.row = indexPath.row;
+    self.section = indexPath.section;
+}
+
+- (NSIndexPath *)indexPath {
+    return [NSIndexPath indexPathForRow:self.row inSection:self.section];
+}
+
 @end

@@ -18,7 +18,9 @@
 @property (nonatomic) NSValue *originalContentOffset;
 @property (nonatomic, strong) NSMutableArray *errorMessages;
 @property (nonatomic) BOOL fieldHasError;
-@property (nonatomic, strong) id object;
+@property (nonatomic, strong) id representedObject;
+@property (nonatomic, strong) NSDateFormatter *dateFormatter;
+@property (nonatomic, strong) NSNumberFormatter *numberFormatter;
 
 @end
 
@@ -51,6 +53,31 @@
 }
 
 /////////////////////////////////////////////
+#pragma mark - Formatters
+/////////////////////////////////////////////
+
+- (NSDateFormatter *)tableViewDateFormatter {
+    if (self.dateFormatter) {
+        return self.dateFormatter;
+    } else {
+        self.dateFormatter = [NSDateFormatter new];
+        self.dateFormatter.dateStyle = NSDateFormatterShortStyle;
+        return self.dateFormatter;
+    }
+}
+
+- (NSNumberFormatter *)tableViewNumberFormatter {
+    if (self.numberFormatter) {
+        return self.numberFormatter;
+    } else {
+        self.numberFormatter = [NSNumberFormatter new];
+        self.numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+        return self.numberFormatter;
+    }
+}
+
+
+/////////////////////////////////////////////
 #pragma mark - TableView Delegate and Datasource
 /////////////////////////////////////////////
 
@@ -62,8 +89,8 @@
     NSMutableArray *objects = [NSMutableArray new];
     for (int i = 0; i < properties.count; i++) {
         NSString *property = [properties objectAtIndex:i];
-        if (self.object) {
-            ITProperty *representedProperty = [ITProperty createFromProperty:property ofObject:self.object];
+        if (self.representedObject) {
+            ITProperty *representedProperty = [ITProperty createFromProperty:property ofObject:self.representedObject];
             [self.propertyDelegate customizeRepresentedProperty:representedProperty];
             [objects addObject:representedProperty];
         }
@@ -72,7 +99,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    self.object = [self.propertyDelegate representedObject];
+    self.representedObject = [self.propertyDelegate representedObject];
     return 1;
 }
 
@@ -88,10 +115,14 @@
     if (cell == nil) {
         cell = [ITTableViewCell new];
     }
+    cell.textField.dateFormatter = [self tableViewDateFormatter];
+    cell.textField.numberFormatter = [self tableViewNumberFormatter];
     cell.textField.displayMessageDelegate = tableView;
+    cell.textField.isErrorMessageDisplayed = [self isErrorMessageDisplayedAtIndexPath:indexPath];
     cell.textField.indexPath = indexPath;
-    cell.textField.respresentedObject = [tableView.objectProperties objectAtIndex:indexPath.row];
-    cell.textField.textFieldActivated = [tableView.propertyDelegate editingBlockForProperty:cell.textField.respresentedObject.representedProperty];
+    cell.textField.representedObject = [tableView.objectProperties objectAtIndex:indexPath.row];
+    [cell.textField updateTextFieldActivated:[tableView.propertyDelegate activationBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];
+    [cell.textField updateTerminationBlock:[tableView.propertyDelegate terminationBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];
     return cell;
 }
 
@@ -143,9 +174,24 @@
 #pragma mark - Error Message Display
 /////////////////////////////////////////////
 
+- (BOOL)isErrorMessageDisplayedAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger row = indexPath.row;
+    NSPredicate *errorMessagePredicate = [NSPredicate predicateWithFormat:@"row == %i", row];
+    NSMutableArray *errorMessagesAtIndexPath = [[self.errorMessages filteredArrayUsingPredicate:errorMessagePredicate] mutableCopy];
+    if (errorMessagesAtIndexPath.count == 1) {
+        return YES;
+    } else if (errorMessagesAtIndexPath.count > 1) {
+        [errorMessagesAtIndexPath removeLastObject];
+        [self.errorMessages removeObjectsInArray:errorMessagesAtIndexPath];
+        
+        return YES;
+    }
+    return NO;
+}
+
 - (void)displayErroMessageAtIndexPath:(NSIndexPath *)indexPath {
     ITErrorMessageView *errorMessageView = [ITErrorMessageView new];
-    errorMessageView.indexPath = indexPath;
+    [errorMessageView updateIndexPath:indexPath];
     ITTableViewCell *cell = (ITTableViewCell *)[self cellForRowAtIndexPath:indexPath];
     errorMessageView.presentingButton = cell.textField.errorButton;
     
@@ -186,13 +232,15 @@
 }
 
 - (void)removeErrorMessageAtIndexPath:(NSIndexPath *)indexPath {
-    ITErrorMessageView *viewToBeRemoved;
+    NSMutableArray *viewsToBeRemoved = [NSMutableArray new];
     for (ITErrorMessageView *view in self.errorMessages) {
-        if (view.indexPath == indexPath) {
-            viewToBeRemoved = view;
+        if (view.row == indexPath.row) {
+            [view removeFromSuperview];
+            [viewsToBeRemoved addObject:view];
         }
     }
-    [viewToBeRemoved removeFromSuperview];
+    [self.errorMessages removeObjectsInArray:viewsToBeRemoved];
+    
     if (self.originalContentOffset) {
         [self setContentOffset:self.originalContentOffset.CGPointValue animated:YES];
         self.originalContentOffset = nil;
@@ -239,7 +287,7 @@
 
 - (void)updateObject {
     for (ITProperty *textObject in self.objectProperties) {
-        [self.object setValue:textObject.currentValue forKey:textObject.representedProperty];
+        [self.representedObject setValue:textObject.currentValue forKey:textObject.representedProperty];
     }
 }
 

@@ -37,11 +37,22 @@
 /**
  *  The block activated when a textField begins editing.
  *
- *  @param property The name of the property to be edited.
+ *  @param property  The property of that is being editted.
+ *  @param textField The textfield containing the property
  *
  *  @return An ActivateBlock which should return the new value for the textField.
  */
-- (ActivateBlock)editingBlockForProperty:(NSString *)property;
+- (ActivateBlock)activationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField;
+
+/**
+ *  Use this block to set the value of the field. This block should set the represented object's current value and textfield's text property.
+ *
+ *  @param property  The property of that is being editted.
+ *  @param textField The textfield containing the property
+ *
+ *  @return A Termination Block that will be executed by the activation block.
+ */
+- (TerminationBlock)terminationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField;
 /**
  *  Use this method to furth customize the textField.
  *
