@@ -21,6 +21,7 @@
 @property (nonatomic, strong) id representedObject;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) NSNumberFormatter *numberFormatter;
+@property (nonatomic) BOOL shouldReloadDataWithCurrentValues;
 
 @end
 
@@ -41,15 +42,6 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-
-/////////////////////////////////////////////
-#pragma mark - Delegate
-/////////////////////////////////////////////
-
-- (void)customizeRepresentedProperty:(ITProperty *)property {
-    
 }
 
 /////////////////////////////////////////////
@@ -105,7 +97,9 @@
 
 - (NSInteger)tableView:(ITTableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSArray *properties = [self properties];
-    tableView.objectProperties = [self createRepresentedProperties:properties];
+    if (!self.shouldReloadDataWithCurrentValues) {
+        tableView.objectProperties = [self createRepresentedProperties:properties];
+    }
     return properties.count;
 }
 
@@ -287,8 +281,14 @@
 
 - (void)updateObject {
     for (ITProperty *textObject in self.objectProperties) {
-        [self.representedObject setValue:textObject.currentValue forKey:textObject.representedProperty];
+        [self.representedObject setValue:textObject.currentValue forKey:textObject.originalValue];
     }
+}
+
+- (void)reloadDataWithCurrentValues {
+    self.shouldReloadDataWithCurrentValues = YES;
+    [super reloadData];
+    self.shouldReloadDataWithCurrentValues = NO;
 }
 
 - (void)reloadData {

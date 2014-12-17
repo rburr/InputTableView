@@ -67,5 +67,5 @@
 - (void)checkAndDisplayValidationErrors;
 - (BOOL)shouldUpdate;
 - (void)updateObject;
-
+- (void)reloadDataWithCurrentValues;
 @end

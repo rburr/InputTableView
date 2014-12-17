@@ -115,6 +115,7 @@
     
     if ([self.tableView shouldUpdate]) {
         [self.tableView updateObject];
+        [self.tableView reloadDataWithCurrentValues];
     } else {
         [self.tableView updateObject];
         

@@ -152,7 +152,6 @@ NSInteger kErrorButtonWidth = 21;
     } else if (self.representedObject.representedPropertyClass == NSNumber.class) {
         self.representedObject.currentValue = ([self.numberFormatter numberFromString:textField.text]);
         self.representedObject.isFieldClear = !(self.representedObject.currentValue);
-        
     }
 }
 
