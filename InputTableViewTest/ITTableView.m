@@ -74,7 +74,14 @@
 /////////////////////////////////////////////
 
 - (NSArray *)properties {
-    return [self.propertyDelegate displayedProperties];
+    NSMutableArray *properties = [NSMutableArray new];
+    for (NSString *property in [self.propertyDelegate displayedProperties]) {
+        if ([self.representedObject respondsToSelector:NSSelectorFromString(property)]) {
+            [properties addObject:property];
+
+        }
+    }
+    return [properties copy];
 }
 
 - (NSArray *)createRepresentedProperties:(NSArray *)properties {
@@ -83,8 +90,10 @@
         NSString *property = [properties objectAtIndex:i];
         if (self.representedObject) {
             ITProperty *representedProperty = [ITProperty createFromProperty:property ofObject:self.representedObject];
-            [self.propertyDelegate customizeRepresentedProperty:representedProperty];
-            [objects addObject:representedProperty];
+            if (representedProperty) {
+                [self.propertyDelegate customizeRepresentedProperty:representedProperty];
+                [objects addObject:representedProperty];
+            }
         }
     }
     return [NSArray arrayWithArray:objects];
@@ -281,7 +290,7 @@
 
 - (void)updateObject {
     for (ITProperty *textObject in self.objectProperties) {
-        [self.representedObject setValue:textObject.currentValue forKey:textObject.originalValue];
+        [self.representedObject setValue:textObject.currentValue forKey:textObject.representedProperty];
     }
 }
 
@@ -291,8 +300,7 @@
     self.shouldReloadDataWithCurrentValues = NO;
 }
 
-- (void)reloadData {
-    //Should force the reload using the current set of textObjects
+- (void)resetChanges {
     [super reloadData];
 }
 

@@ -14,15 +14,18 @@
 @implementation ITProperty
 
 + (instancetype)createFromProperty:(NSString *)propertyName ofObject:(id)object {
-    ITProperty *textObject = [ITProperty new];
-    id value = [object valueForKey:propertyName];
-    textObject.representedProperty = propertyName;
-    textObject.originalValue = value;
-    textObject.currentValue = value;
-    textObject.propertyName = [self formatPropertyName:propertyName];
-    textObject.representedPropertyClass = [ITProperty classForProperty:propertyName fromObject:object];
-
-    return textObject;
+    if ([object respondsToSelector:NSSelectorFromString(propertyName)]) {
+        ITProperty *textObject = [ITProperty new];
+        id value = [object valueForKey:propertyName];
+        textObject.representedProperty = propertyName;
+        textObject.originalValue = value;
+        textObject.currentValue = value;
+        textObject.propertyName = [self formatPropertyName:propertyName];
+        textObject.representedPropertyClass = [ITProperty classForProperty:propertyName fromObject:object];
+        return textObject;
+    }
+    
+    return nil;
 }
 
 + (NSString *)formatPropertyName:(NSString *)camelCaseString {
@@ -30,7 +33,7 @@
     for (int i = 0; i < [camelCaseString length]; i++) {
         unichar character = [camelCaseString characterAtIndex:i];
         if ([[NSCharacterSet alphanumericCharacterSet] characterIsMember:character]) {
-            NSString *letter = [NSString stringWithFormat: @"%C", character];
+            NSString *letter = [NSString stringWithFormat:@"%C", character];
             if ([[NSCharacterSet uppercaseLetterCharacterSet] characterIsMember:character]) {
                 [spacedString appendString:[NSString stringWithFormat:@" %@", letter]];
             } else {

@@ -19,6 +19,14 @@
 @property (nonatomic) BOOL isFieldClear;
 @property (nonatomic) BOOL displayError;
 
+/**
+ *  Creates an ITProperty object representing the propertyName parameter of the object specified. If a the object does not have a property corresponding to the propertyName, this method will return nil.
+ *
+ *  @param propertyName The Property which is represented by the ITProperty instance.
+ *  @param object       The Object whose property is to be represented.
+ *
+ *  @return An ITProperty object which represents a property of the specified object.
+ */
 + (instancetype)createFromProperty:(NSString *)propertyName ofObject:(id)object;
 - (BOOL)hasErrorMessage;
 - (void)addValidationRules:(NSSet *)objects;

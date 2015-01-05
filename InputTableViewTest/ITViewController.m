@@ -31,7 +31,7 @@
 }
 
 - (NSArray *)displayedProperties {
-    return @[@"firstName", @"lastName", @"age", @"homeOrMobilePhone", @"streetOne", @"streetTwo", @"streetThree", @"zip", @"city", @"state", @"country", @"dateOfBirth", @"licenseId", @"licenseState", @"licenseCountry", @"powerLevel"];
+    return @[@"firstName", @"lastName", @"age", @"homeOrMobilePhone", @"streetOne", @"streetTwo", @"streetThree", @"zip", @"city", @"state", @"country", @"dateOfBirth", @"licenseId", @"licenseState", @"licenseCountry", @"powerLevel", @"testingInvalidProperty"];
 }
 
 - (void)customizeRepresentedProperty:(ITProperty *)property {
@@ -51,10 +51,10 @@
     return [ITTestObject testObject];
 }
 
-- (ActivateBlock)activationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField {
+- (ActivationBlock)activationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField {
     if ([property.representedProperty isEqualToString:@"dateOfBirth"]) {
         blockVar(self, weakSelf)
-        ActivateBlock dobBlock = ^(TerminationBlock terminationBlock) {
+        ActivationBlock dobBlock = ^(TerminationBlock terminationBlock) {
        
             UIView *view = [UIView new];
             view.backgroundColor = [UIColor whiteColor];
@@ -92,7 +92,7 @@
             [view addSubview:doneButton];
             [weakSelf.view addSubview:view];
         };
-        return [dobBlock copy];
+        return dobBlock;
     }
     return nil;
 }
@@ -105,7 +105,7 @@
             formatter.dateStyle = NSDateFormatterShortStyle;
             textField.text = [formatter stringFromDate:date];
         };
-        return [dobBlock copy];
+        return dobBlock;
     }
     return nil;
 }

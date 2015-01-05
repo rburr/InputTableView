@@ -10,9 +10,7 @@
 #import "ITProperty.h"
 
 typedef void (^TerminationBlock)(id newValue);
-typedef void (^ActivateBlock)(TerminationBlock terminationBlock);
-//typedef void (^ActivateBlock)(SEL updateValue);
-
+typedef void (^ActivationBlock)(TerminationBlock terminationBlock);
 
 @protocol ITDisplayErrorMessageDelegate <NSObject>
 - (void)displayErroMessageAtIndexPath:(NSIndexPath *)indexPath;
@@ -24,7 +22,7 @@ typedef void (^ActivateBlock)(TerminationBlock terminationBlock);
 @property (nonatomic, weak) id <ITDisplayErrorMessageDelegate> displayMessageDelegate;
 @property (nonatomic, strong) NSIndexPath *indexPath;
 @property (nonatomic, strong) ITProperty *representedObject;
-@property (nonatomic, copy) ActivateBlock textFieldActivated;
+@property (nonatomic, copy) ActivationBlock textFieldActivated;
 @property (nonatomic, copy) TerminationBlock terminationBlock;
 @property (nonatomic, strong) NSNumberFormatter *numberFormatter;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
@@ -37,6 +35,6 @@ typedef void (^ActivateBlock)(TerminationBlock terminationBlock);
 
 
 - (void)updateTerminationBlock:(TerminationBlock)terminationBlock;
-- (void)updateTextFieldActivated:(ActivateBlock)textFieldActivated;
+- (void)updateTextFieldActivated:(ActivationBlock)textFieldActivated;
 
 @end

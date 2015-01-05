@@ -103,25 +103,25 @@ NSInteger kErrorButtonWidth = 21;
 #pragma mark - Block Methods
 /////////////////////////////////////////////
 
-- (void)updateTextFieldActivated:(ActivateBlock)textFieldActivated {
+- (void)updateTextFieldActivated:(ActivationBlock)textFieldActivated {
     blockVar(self, weakSelf);
     if (textFieldActivated) {
-    self.textFieldActivated = [^(TerminationBlock block) {
+    self.textFieldActivated = ^(TerminationBlock block) {
         if (block) {
             textFieldActivated(block);
         }
         weakSelf.isActivationBlockActive = YES;
-    } copy];
+    };
     }
 }
 
 - (void)updateTerminationBlock:(TerminationBlock)terminationBlock {
     blockVar(self, weakSelf);
     if (terminationBlock) {
-    self.terminationBlock = [^(id value) {
+    self.terminationBlock = ^(id value) {
         terminationBlock(value);
         weakSelf.isActivationBlockActive = NO;
-    } copy];
+    };
     }
 }
 
