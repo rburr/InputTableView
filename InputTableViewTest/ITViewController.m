@@ -36,10 +36,14 @@
 
 - (void)customizeRepresentedProperty:(ITProperty *)property {
     if ([property.originalValue isKindOfClass:[NSString class]] && ((NSString *)property.originalValue).length > 0) {
-        ITValidationMinimumLengthRule *minimumLengthRule = [[ITValidationMinimumLengthRule alloc] init];
-        minimumLengthRule.minimumLength = 11;
         ITValidationRequiredRule *requiredRule = [[ITValidationRequiredRule alloc] init];
-        property.validationRules = $$(minimumLengthRule, requiredRule);
+        property.validationRules = $$(requiredRule);
+        
+        if ([property.representedProperty isEqualToString:@"zip"]) {
+            ITValidationMinimumLengthRule *minimumLengthRule = [[ITValidationMinimumLengthRule alloc] init];
+            minimumLengthRule.minimumLength = 5;
+            property.validationRules = $$(minimumLengthRule, requiredRule);
+        }
     }
     if (property.representedPropertyClass == [NSDate class]) {
         ITValidationRequiredRule *requiredRule = [[ITValidationRequiredRule alloc] init];

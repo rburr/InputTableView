@@ -126,7 +126,7 @@
     cell.textField.representedObject = [tableView.objectProperties objectAtIndex:indexPath.row];
     
     if ([tableView.propertyDelegate respondsToSelector:@selector(activationBlockForProperty:andTextField:)]) {
-        [cell.textField updateTextFieldActivated:[tableView.propertyDelegate activationBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];
+        [cell.textField updateActivationBlock:[tableView.propertyDelegate activationBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];
     }
     if ([tableView.propertyDelegate respondsToSelector:@selector(completionBlockForProperty:andTextField:)]) {
         [cell.textField updateCompletionBlock:[tableView.propertyDelegate completionBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];

@@ -23,7 +23,7 @@ typedef void (^ActivationBlock)(CompletionBlock completionBlock, TerminationBloc
 @property (nonatomic, weak) id <ITDisplayErrorMessageDelegate> displayMessageDelegate;
 @property (nonatomic, strong) NSIndexPath *indexPath;
 @property (nonatomic, strong) ITProperty *representedObject;
-@property (nonatomic, copy) ActivationBlock textFieldActivated;
+@property (nonatomic, copy) ActivationBlock activationBlock;
 @property (nonatomic, copy) CompletionBlock completionBlock;
 @property (nonatomic, copy) TerminationBlock terminationBlock;
 @property (nonatomic, strong) NSNumberFormatter *numberFormatter;
@@ -39,6 +39,6 @@ typedef void (^ActivationBlock)(CompletionBlock completionBlock, TerminationBloc
 
 - (void)updateCompletionBlock:(CompletionBlock)completion;
 - (void)updateTerminationBlock:(TerminationBlock)terminationBlock;
-- (void)updateTextFieldActivated:(ActivationBlock)textFieldActivated;
+- (void)updateActivationBlock:(ActivationBlock) activationBlock;
 
 @end

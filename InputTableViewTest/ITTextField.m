@@ -107,11 +107,11 @@ NSInteger kErrorButtonWidth = 21;
 #pragma mark - Block Methods
 /////////////////////////////////////////////
 
-- (void)updateTextFieldActivated:(ActivationBlock)textFieldActivated {
+- (void)updateActivationBlock:(ActivationBlock)activationBlock {
     blockVar(self, weakSelf);
-    if (textFieldActivated) {
-    self.textFieldActivated = [^(CompletionBlock completion, TerminationBlock termination) {
-            textFieldActivated(completion, termination);
+    if (activationBlock) {
+    self.activationBlock = [^(CompletionBlock completion, TerminationBlock termination) {
+            activationBlock(completion, termination);
             weakSelf.isActivationBlockActive = YES;
     } copy];
     }
@@ -156,9 +156,9 @@ NSInteger kErrorButtonWidth = 21;
     self.floatingPlaceHolderLabel.textColor = [UIColor colorWithRed:.1 green:.2 blue:.8 alpha:1.0];
     
     self.isFieldClear = NO;
-    if (self.textFieldActivated) {
+    if (self. activationBlock) {
         if (!self.isActivationBlockActive) {
-            self.textFieldActivated(self.completionBlock, self.terminationBlock);
+            self. activationBlock(self.completionBlock, self.terminationBlock);
         }
         return NO;
     }
