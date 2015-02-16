@@ -9,10 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "ITProperty.h"
 
-typedef void (^TerminationBlock)(id newValue);
-typedef void (^ActivateBlock)(TerminationBlock terminationBlock);
-//typedef void (^ActivateBlock)(SEL updateValue);
-
+typedef void (^CompletionBlock)(id newValue);
+typedef void (^TerminationBlock)();
+typedef void (^ActivateBlock)(CompletionBlock completionBlock, TerminationBlock terminationBlock);
 
 @protocol ITDisplayErrorMessageDelegate <NSObject>
 - (void)displayErroMessageAtIndexPath:(NSIndexPath *)indexPath;
@@ -25,6 +24,7 @@ typedef void (^ActivateBlock)(TerminationBlock terminationBlock);
 @property (nonatomic, strong) NSIndexPath *indexPath;
 @property (nonatomic, strong) ITProperty *representedObject;
 @property (nonatomic, copy) ActivateBlock textFieldActivated;
+@property (nonatomic, copy) CompletionBlock completionBlock;
 @property (nonatomic, copy) TerminationBlock terminationBlock;
 @property (nonatomic, strong) NSNumberFormatter *numberFormatter;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
@@ -32,10 +32,12 @@ typedef void (^ActivateBlock)(TerminationBlock terminationBlock);
 @property (nonatomic, strong) UIButton *errorButton;
 @property (nonatomic, strong) UILabel *floatingPlaceHolderLabel;
 @property (nonatomic) BOOL isErrorMessageDisplayed;
+@property (nonatomic) BOOL shouldActivateNextTextFieldOnReturn;
+@property (nonatomic) BOOL shouldActivationBlockPersist;
 
 - (void)displayErrorButton;
 
-
+- (void)updateCompletionBlock:(CompletionBlock)completion;
 - (void)updateTerminationBlock:(TerminationBlock)terminationBlock;
 - (void)updateTextFieldActivated:(ActivateBlock)textFieldActivated;
 

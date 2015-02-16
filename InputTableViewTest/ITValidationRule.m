@@ -15,6 +15,14 @@ static NSString *const kWildcard = @"%@";
 
 @implementation ITValidationRule
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _priority = 10;
+    }
+    return self;
+}
+
 - (TextShouldChangeAtRange)makeSpecificCaseBlockForUpperCase:(BOOL)upperCase {
     __block BOOL isUpperCase = upperCase;
     return ^BOOL(UITextField *textField, NSString *newText, NSRange range){

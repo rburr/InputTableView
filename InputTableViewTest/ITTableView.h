@@ -50,7 +50,16 @@
  *  @param property  The property of that is being editted.
  *  @param textField The textfield containing the property
  *
- *  @return A Termination Block that will be executed by the activation block.
+ *  @return A Completion Block that will execute when indicated by the action Block.
+ */
+- (CompletionBlock)completionBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField;
+/**
+ *  This block is perform when the textField ends editting.
+ *
+ *  @param property  The property of that is being editted.
+ *  @param textField The textfield containing the property
+ *
+ *  @return A Termination Block that will execute when the textField is done editting.
  */
 - (TerminationBlock)terminationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField;
 /**
@@ -67,5 +76,7 @@
 - (void)checkAndDisplayValidationErrors;
 - (BOOL)shouldUpdate;
 - (void)updateObject;
+- (void)scrollToTextField:(ITTextField *)textField;
+- (void)scrollToTextField:(ITTextField *)textField visibleTableViewBounds:(CGRect)bounds;
 
 @end

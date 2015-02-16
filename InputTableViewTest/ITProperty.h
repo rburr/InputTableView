@@ -10,7 +10,7 @@
 #import "ITValidationRule.h"
 
 @interface ITProperty : NSObject
-@property (nonatomic, strong) NSSet *validationRules;
+@property (nonatomic, strong) NSOrderedSet *validationRules;
 @property (nonatomic, strong) NSString *propertyName;
 @property (nonatomic, strong) NSString *representedProperty;
 @property (nonatomic, strong) id originalValue;

@@ -13,7 +13,7 @@
 
 static NSString *const kActivationBlockCompleted = @"kTextFieldActivationBlockCompleted";
 static NSString *const kTerminationBlockCompleted = @"kTextFieldTerminationBlockCompleted";
-
+static NSString *const kBecomeFirstResonder = @"kTextFieldTerminationBlockCompleted";
 
 @interface ITTextField ()
 @property (nonatomic, strong) UIColor *originalTextColor;
@@ -43,13 +43,17 @@ NSInteger kErrorButtonWidth = 21;
     return self;
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)setRepresentedObject:(ITProperty *)respresentedObject {
     _representedObject = respresentedObject;
     self.placeholder = respresentedObject.propertyName;
     self.floatingPlaceHolderLabel.text = respresentedObject.propertyName;
     
     NSPredicate *validationRulePredicate = [NSPredicate predicateWithFormat:@"class == %@", [ITValidationRequiredRule class]];
-    self.isRequiredField = ([respresentedObject.validationRules filteredSetUsingPredicate:validationRulePredicate].count > 0);
+    self.isRequiredField = ([respresentedObject.validationRules filteredOrderedSetUsingPredicate:validationRulePredicate].count > 0);
     if (self.isRequiredField) {
         [self requiredIndicator];
     }
@@ -106,22 +110,38 @@ NSInteger kErrorButtonWidth = 21;
 - (void)updateTextFieldActivated:(ActivateBlock)textFieldActivated {
     blockVar(self, weakSelf);
     if (textFieldActivated) {
-    self.textFieldActivated = [^(TerminationBlock block) {
-        if (block) {
-            textFieldActivated(block);
-        }
-        weakSelf.isActivationBlockActive = YES;
+    self.textFieldActivated = [^(CompletionBlock completion, TerminationBlock termination) {
+            textFieldActivated(completion, termination);
+            weakSelf.isActivationBlockActive = YES;
     } copy];
+    }
+}
+
+- (void)updateCompletionBlock:(CompletionBlock)completionBlock {
+    blockVar(self, weakSelf);
+    if (completionBlock) {
+        self.completionBlock = [^(id value) {
+            completionBlock(value);
+            weakSelf.isActivationBlockActive = NO;
+        } copy];
     }
 }
 
 - (void)updateTerminationBlock:(TerminationBlock)terminationBlock {
     blockVar(self, weakSelf);
     if (terminationBlock) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(performTerminationBlock:) name:kBecomeFirstResonder object:nil];
     self.terminationBlock = [^(id value) {
         terminationBlock(value);
         weakSelf.isActivationBlockActive = NO;
     } copy];
+    }
+}
+
+- (void)performTerminationBlock:(NSNotification *)notification {
+    if (self.terminationBlock && ![notification.object isEqual:self] && !self.shouldActivationBlockPersist) {
+        self.terminationBlock();
     }
 }
 
@@ -138,7 +158,7 @@ NSInteger kErrorButtonWidth = 21;
     self.isFieldClear = NO;
     if (self.textFieldActivated) {
         if (!self.isActivationBlockActive) {
-            self.textFieldActivated(self.terminationBlock);
+            self.textFieldActivated(self.completionBlock, self.terminationBlock);
         }
         return NO;
     }
@@ -152,16 +172,22 @@ NSInteger kErrorButtonWidth = 21;
     } else if (self.representedObject.representedPropertyClass == NSNumber.class) {
         self.representedObject.currentValue = ([self.numberFormatter numberFromString:textField.text]);
         self.representedObject.isFieldClear = !(self.representedObject.currentValue);
-        
+    }
+    if (self.completionBlock) {
+        self.completionBlock(nil);
     }
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     BOOL shouldChangeCharacters = YES;
+    //Allows for deleting of text to occur
+    if ([string isEqualToString:@""]) {
+        return YES;
+    }
     for (ITValidationRule *rule in self.representedObject.validationRules) {
         if (rule.textShouldChangeAtRange) {
             if (!rule.textShouldChangeAtRange(textField, string, range)) {
-                shouldChangeCharacters = NO;
+                return NO;
             }
         }
     }
@@ -170,12 +196,23 @@ NSInteger kErrorButtonWidth = 21;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [self resignFirstResponder];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kTextFieldShouldReturn object:self.indexPath];
+    if (self.shouldActivateNextTextFieldOnReturn) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kTextFieldShouldReturn object:self.indexPath];
+    }
     return YES;
 }
 
 - (void)textDidChange {
 
+}
+
+/////////////////////////////////////////////
+#pragma mark - First Responder Methods
+/////////////////////////////////////////////
+
+- (BOOL)becomeFirstResponder {
+    [[NSNotificationCenter defaultCenter] postNotificationName:kBecomeFirstResonder object:self];
+    return [super becomeFirstResponder];
 }
 
 /////////////////////////////////////////////

@@ -121,8 +121,16 @@
     cell.textField.isErrorMessageDisplayed = [self isErrorMessageDisplayedAtIndexPath:indexPath];
     cell.textField.indexPath = indexPath;
     cell.textField.representedObject = [tableView.objectProperties objectAtIndex:indexPath.row];
-    [cell.textField updateTextFieldActivated:[tableView.propertyDelegate activationBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];
-    [cell.textField updateTerminationBlock:[tableView.propertyDelegate terminationBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];
+    
+    if ([tableView.propertyDelegate respondsToSelector:@selector(activationBlockForProperty:andTextField:)]) {
+        [cell.textField updateTextFieldActivated:[tableView.propertyDelegate activationBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];
+    }
+    if ([tableView.propertyDelegate respondsToSelector:@selector(completionBlockForProperty:andTextField:)]) {
+        [cell.textField updateCompletionBlock:[tableView.propertyDelegate completionBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];
+    }
+    if ([tableView.propertyDelegate respondsToSelector:@selector(terminationBlockForProperty:andTextField:)]) {
+        [cell.textField updateTerminationBlock:[tableView.propertyDelegate terminationBlockForProperty:cell.textField.representedObject andTextField:cell.textField]];
+    }
     return cell;
 }
 
@@ -153,6 +161,22 @@
         [self setContentInset:self.originalEdgeInsets];
         [self setScrollIndicatorInsets:self.originalEdgeInsets];
     }];
+}
+
+/////////////////////////////////////////////
+#pragma mark - Scroll To TextField
+/////////////////////////////////////////////
+
+- (void)scrollToTextField:(ITTextField *)textField {
+    CGRect textFieldCellFrame = [self rectForRowAtIndexPath:textField.indexPath];
+    [self scrollRectToVisible:textFieldCellFrame animated:YES];
+}
+
+- (void)scrollToTextField:(ITTextField *)textField visibleTableViewBounds:(CGRect)bounds {
+    CGRect originalBounds = self.bounds;
+    self.bounds = bounds;
+    [self scrollToTextField:textField];
+    self.bounds = originalBounds;
 }
 
 /////////////////////////////////////////////

@@ -37,14 +37,22 @@
 - (void)customizeRepresentedProperty:(ITProperty *)property {
     if ([property.originalValue isKindOfClass:[NSString class]] && ((NSString *)property.originalValue).length > 0) {
         ITValidationMinimumLengthRule *minimumLengthRule = [[ITValidationMinimumLengthRule alloc] init];
-        minimumLengthRule.minimumLength = 2;
+        minimumLengthRule.minimumLength = 11;
         ITValidationRequiredRule *requiredRule = [[ITValidationRequiredRule alloc] init];
-        property.validationRules = $(minimumLengthRule, requiredRule);
+        property.validationRules = $$(minimumLengthRule, requiredRule);
     }
     if (property.representedPropertyClass == [NSDate class]) {
         ITValidationRequiredRule *requiredRule = [[ITValidationRequiredRule alloc] init];
-        property.validationRules = $(requiredRule);
+        property.validationRules = $$(requiredRule);
     }
+    if ([property.representedProperty isEqualToString:@"lastName"]) {
+        [property addValidationRules:$([ITValidationUpperCaseOnlyRule new])];
+    }
+    
+    ITValidationMaximumLengthRule *maximumLengthRule = [ITValidationMaximumLengthRule new];
+    maximumLengthRule.maximumLength = 30;
+    maximumLengthRule.priority = 12;
+    [property addValidationRules:$(maximumLengthRule)];
 }
 
 - (id)representedObject {
@@ -54,8 +62,7 @@
 - (ActivateBlock)activationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField {
     if ([property.representedProperty isEqualToString:@"dateOfBirth"]) {
         blockVar(self, weakSelf)
-        ActivateBlock dobBlock = ^(TerminationBlock terminationBlock) {
-       
+        ActivateBlock dobBlock = ^(CompletionBlock completionBlock, TerminationBlock terminationBlock) {
             UIView *view = [UIView new];
             view.backgroundColor = [UIColor whiteColor];
             view.frame = CGRectMake(0, weakSelf.view.frame.size.height - 200, weakSelf.view.frame.size.width, 200);
@@ -67,11 +74,11 @@
             void (^wrapperBlock)() = ^(){
                 [view removeFromSuperview];
                 //The original block I wanted to call
-                terminationBlock(picker.date);
+                completionBlock(picker.date);
             };
             
             //Dynamic Selector name
-            SEL myMethod;
+            SEL myMethod = NSSelectorFromString(@"myMethod");
             //Create the implementation
             void(*impFunct)(id, SEL, id) = (void*) imp_implementationWithBlock(wrapperBlock);
             //Add the block to the class at runtime, replace it if it already exists
@@ -88,9 +95,29 @@
             //Assign the dynamic method to the button action
             [doneButton addTarget:weakSelf action:myMethod forControlEvents:UIControlEventTouchUpInside];
             
+            [textField updateTerminationBlock:^{
+                [view removeFromSuperview];
+            }];
+            
             [view addSubview:picker];
             [view addSubview:doneButton];
             [weakSelf.view addSubview:view];
+            CGRect bounds = weakSelf.tableView.bounds;
+            bounds.size.height = bounds.size.height - 200;
+            [weakSelf.tableView scrollToTextField:textField visibleTableViewBounds:bounds];
+        };
+        return [dobBlock copy];
+    }
+    return nil;
+}
+
+- (CompletionBlock)completionBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField {
+    if ([property.representedProperty isEqualToString:@"dateOfBirth"]) {
+        CompletionBlock dobBlock = ^(NSDate *date) {
+            property.currentValue = date;
+            NSDateFormatter *formatter = [NSDateFormatter new];
+            formatter.dateStyle = NSDateFormatterShortStyle;
+            textField.text = [formatter stringFromDate:date];
         };
         return [dobBlock copy];
     }
@@ -99,12 +126,7 @@
 
 - (TerminationBlock)terminationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField {
     if ([property.representedProperty isEqualToString:@"dateOfBirth"]) {
-        TerminationBlock dobBlock = ^(NSDate *date) {
-            property.currentValue = date;
-            NSDateFormatter *formatter = [NSDateFormatter new];
-            formatter.dateStyle = NSDateFormatterShortStyle;
-            textField.text = [formatter stringFromDate:date];
-        };
+        TerminationBlock dobBlock = nil;
         return [dobBlock copy];
     }
     return nil;

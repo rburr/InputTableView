@@ -13,7 +13,7 @@
 + (instancetype)testObject {
     ITTestObject *one = [ITTestObject new];
     one.firstName = @"Bob";
-    one.lastName = @"Paulson";
+    one.lastName = @"PAULSON";
     one.age = @46;
     one.zip = @"56328";
     one.streetOne = @"760 High Ridge";
