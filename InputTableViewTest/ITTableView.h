@@ -11,8 +11,6 @@
 #import "ITProperty.h"
 
 @protocol ITTableViewDelegate <NSObject, UIScrollViewDelegate>
-//- (NSArray *)displayedPropertiesForObject:(id)sectionObject;
-//- (NSArray *)validationRulesForProperty:(NSString *)property object:(id)sectionObject;
 
 /**
  *  The Object whose properties are to be displayed in by the tableView.
@@ -26,6 +24,8 @@
  *  @return An array of strings representing the keys for each property.
  */
 - (NSArray *)displayedProperties;
+
+@optional
 /**
  *  Use this method to further customize the validation rules and other attributes of the property.
  *
@@ -33,7 +33,6 @@
  */
 - (void)customizeRepresentedProperty:(ITProperty *)property;
 
-@optional
 /**
  *  The block activated when a textField begins editing.
  *
@@ -42,7 +41,7 @@
  *
  *  @return An ActivateBlock which should return the new value for the textField.
  */
-- (ActivateBlock)activationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField;
+- (ActivationBlock)activationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField;
 
 /**
  *  Use this block to set the value of the field. This block should set the represented object's current value and textfield's text property.
@@ -78,5 +77,6 @@
 - (void)updateObject;
 - (void)scrollToTextField:(ITTextField *)textField;
 - (void)scrollToTextField:(ITTextField *)textField visibleTableViewBounds:(CGRect)bounds;
-
+- (void)reloadDataWithCurrentValues;
+- (void)resetChanges;
 @end

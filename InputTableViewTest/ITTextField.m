@@ -107,7 +107,7 @@ NSInteger kErrorButtonWidth = 21;
 #pragma mark - Block Methods
 /////////////////////////////////////////////
 
-- (void)updateTextFieldActivated:(ActivateBlock)textFieldActivated {
+- (void)updateTextFieldActivated:(ActivationBlock)textFieldActivated {
     blockVar(self, weakSelf);
     if (textFieldActivated) {
     self.textFieldActivated = [^(CompletionBlock completion, TerminationBlock termination) {
@@ -132,10 +132,10 @@ NSInteger kErrorButtonWidth = 21;
     if (terminationBlock) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(performTerminationBlock:) name:kBecomeFirstResonder object:nil];
-    self.terminationBlock = [^(id value) {
+    self.terminationBlock = ^(id value) {
         terminationBlock(value);
         weakSelf.isActivationBlockActive = NO;
-    } copy];
+    };
     }
 }
 

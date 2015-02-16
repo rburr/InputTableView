@@ -21,6 +21,7 @@
 @property (nonatomic, strong) id representedObject;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) NSNumberFormatter *numberFormatter;
+@property (nonatomic) BOOL shouldReloadDataWithCurrentValues;
 
 @end
 
@@ -41,15 +42,6 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-
-/////////////////////////////////////////////
-#pragma mark - Delegate
-/////////////////////////////////////////////
-
-- (void)customizeRepresentedProperty:(ITProperty *)property {
-    
 }
 
 /////////////////////////////////////////////
@@ -82,7 +74,14 @@
 /////////////////////////////////////////////
 
 - (NSArray *)properties {
-    return [self.propertyDelegate displayedProperties];
+    NSMutableArray *properties = [NSMutableArray new];
+    for (NSString *property in [self.propertyDelegate displayedProperties]) {
+        if ([self.representedObject respondsToSelector:NSSelectorFromString(property)]) {
+            [properties addObject:property];
+
+        }
+    }
+    return [properties copy];
 }
 
 - (NSArray *)createRepresentedProperties:(NSArray *)properties {
@@ -91,8 +90,10 @@
         NSString *property = [properties objectAtIndex:i];
         if (self.representedObject) {
             ITProperty *representedProperty = [ITProperty createFromProperty:property ofObject:self.representedObject];
-            [self.propertyDelegate customizeRepresentedProperty:representedProperty];
-            [objects addObject:representedProperty];
+            if (representedProperty) {
+                [self.propertyDelegate customizeRepresentedProperty:representedProperty];
+                [objects addObject:representedProperty];
+            }
         }
     }
     return [NSArray arrayWithArray:objects];
@@ -105,7 +106,9 @@
 
 - (NSInteger)tableView:(ITTableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSArray *properties = [self properties];
-    tableView.objectProperties = [self createRepresentedProperties:properties];
+    if (!self.shouldReloadDataWithCurrentValues) {
+        tableView.objectProperties = [self createRepresentedProperties:properties];
+    }
     return properties.count;
 }
 
@@ -315,8 +318,13 @@
     }
 }
 
-- (void)reloadData {
-    //Should force the reload using the current set of textObjects
+- (void)reloadDataWithCurrentValues {
+    self.shouldReloadDataWithCurrentValues = YES;
+    [super reloadData];
+    self.shouldReloadDataWithCurrentValues = NO;
+}
+
+- (void)resetChanges {
     [super reloadData];
 }
 

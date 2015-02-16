@@ -31,7 +31,7 @@
 }
 
 - (NSArray *)displayedProperties {
-    return @[@"firstName", @"lastName", @"age", @"homeOrMobilePhone", @"streetOne", @"streetTwo", @"streetThree", @"zip", @"city", @"state", @"country", @"dateOfBirth", @"licenseId", @"licenseState", @"licenseCountry", @"powerLevel"];
+    return @[@"firstName", @"lastName", @"age", @"homeOrMobilePhone", @"streetOne", @"streetTwo", @"streetThree", @"zip", @"city", @"state", @"country", @"dateOfBirth", @"licenseId", @"licenseState", @"licenseCountry", @"powerLevel", @"testingInvalidProperty"];
 }
 
 - (void)customizeRepresentedProperty:(ITProperty *)property {
@@ -59,10 +59,10 @@
     return [ITTestObject testObject];
 }
 
-- (ActivateBlock)activationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField {
+- (ActivationBlock)activationBlockForProperty:(ITProperty *)property andTextField:(ITTextField *)textField {
     if ([property.representedProperty isEqualToString:@"dateOfBirth"]) {
         blockVar(self, weakSelf)
-        ActivateBlock dobBlock = ^(CompletionBlock completionBlock, TerminationBlock terminationBlock) {
+        ActivationBlock dobBlock = ^(CompletionBlock completionBlock, TerminationBlock terminationBlock) {
             UIView *view = [UIView new];
             view.backgroundColor = [UIColor whiteColor];
             view.frame = CGRectMake(0, weakSelf.view.frame.size.height - 200, weakSelf.view.frame.size.width, 200);
@@ -106,7 +106,7 @@
             bounds.size.height = bounds.size.height - 200;
             [weakSelf.tableView scrollToTextField:textField visibleTableViewBounds:bounds];
         };
-        return [dobBlock copy];
+        return dobBlock;
     }
     return nil;
 }
@@ -119,7 +119,7 @@
             formatter.dateStyle = NSDateFormatterShortStyle;
             textField.text = [formatter stringFromDate:date];
         };
-        return [dobBlock copy];
+        return dobBlock;
     }
     return nil;
 }
@@ -137,6 +137,7 @@
     
     if ([self.tableView shouldUpdate]) {
         [self.tableView updateObject];
+        [self.tableView reloadDataWithCurrentValues];
     } else {
         [self.tableView updateObject];
         
